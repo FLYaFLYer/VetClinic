@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 
-namespace VetClinic
+namespace VetClinic.Utils
 {
-    internal class Manager
+    internal class ExcelExporter
     {
-        public static Frame MainFrame { get; set; }
     }
 }

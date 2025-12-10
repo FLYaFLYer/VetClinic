@@ -1,0 +1,903 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище veterclinicModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="animal_types">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="description" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="breeds">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="animal_type_id" Type="int" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="medicine_stocks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="medicine_id" Type="int" Nullable="false" />
+          <Property Name="quantity" Type="int" Nullable="false" />
+          <Property Name="location" Type="nvarchar" MaxLength="50" />
+          <Property Name="expiry_date" Type="date" />
+        </EntityType>
+        <EntityType Name="medicines">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="description" Type="nvarchar" MaxLength="500" />
+          <Property Name="category" Type="nvarchar" MaxLength="50" />
+          <Property Name="unit" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="price" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="min_stock" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="notifications">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="medicine_id" Type="int" Nullable="false" />
+          <Property Name="message" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="created_date" Type="datetime" Nullable="false" />
+          <Property Name="is_read" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="owners">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="first_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="last_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="phone" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="email" Type="nvarchar" MaxLength="100" />
+          <Property Name="address" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="patients">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="owner_id" Type="int" Nullable="false" />
+          <Property Name="animal_type_id" Type="int" Nullable="false" />
+          <Property Name="breed_id" Type="int" />
+          <Property Name="birth_date" Type="date" />
+          <Property Name="weight" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="color" Type="nvarchar" MaxLength="50" />
+          <Property Name="distinctive_features" Type="nvarchar" MaxLength="500" />
+          <Property Name="avatar_path" Type="nvarchar" MaxLength="500" />
+          <Property Name="chip_number" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="prescriptions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="visit_id" Type="int" Nullable="false" />
+          <Property Name="medicine_id" Type="int" Nullable="false" />
+          <Property Name="dosage" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="frequency" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="duration_days" Type="int" Nullable="false" />
+          <Property Name="quantity" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="first_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="middle_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="last_name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="date_of_birth" Type="date" Nullable="false" />
+          <Property Name="phone_number" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="date_of_hire" Type="date" Nullable="false" />
+          <Property Name="role_id" Type="int" Nullable="false" />
+          <Property Name="login" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="password" Type="nvarchar" MaxLength="64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="visits">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="patient_id" Type="int" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="visit_date" Type="datetime" Nullable="false" />
+          <Property Name="diagnosis" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="symptoms" Type="nvarchar" MaxLength="1000" />
+          <Property Name="temperature" Type="decimal" Precision="4" Scale="2" />
+          <Property Name="weight" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="recommendations" Type="nvarchar" MaxLength="1000" />
+          <Property Name="next_visit_date" Type="date" />
+          <Property Name="status" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_breeds_animal_types">
+          <End Role="animal_types" Type="Self.animal_types" Multiplicity="1" />
+          <End Role="breeds" Type="Self.breeds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="animal_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="breeds">
+              <PropertyRef Name="animal_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_medicine_stocks_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="medicine_stocks" Type="Self.medicine_stocks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="medicine_stocks">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notifications_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="notifications" Type="Self.notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="notifications">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_animal_types">
+          <End Role="animal_types" Type="Self.animal_types" Multiplicity="1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="animal_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="animal_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_breeds">
+          <End Role="breeds" Type="Self.breeds" Multiplicity="0..1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="breeds">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="breed_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_owners">
+          <End Role="owners" Type="Self.owners" Multiplicity="1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="owners">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_prescriptions_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="prescriptions" Type="Self.prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="prescriptions">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_prescriptions_visits">
+          <End Role="visits" Type="Self.visits" Multiplicity="1" />
+          <End Role="prescriptions" Type="Self.prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="visits">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="prescriptions">
+              <PropertyRef Name="visit_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_users_roles">
+          <End Role="roles" Type="Self.roles" Multiplicity="1" />
+          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_visits_patients">
+          <End Role="patients" Type="Self.patients" Multiplicity="1" />
+          <End Role="visits" Type="Self.visits" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="patients">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="visits">
+              <PropertyRef Name="patient_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_visits_users">
+          <End Role="users" Type="Self.users" Multiplicity="1" />
+          <End Role="visits" Type="Self.visits" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="visits">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="AddVisit" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="patient_id" Type="int" Mode="In" />
+          <Parameter Name="user_id" Type="int" Mode="In" />
+          <Parameter Name="diagnosis" Type="nvarchar" Mode="In" />
+          <Parameter Name="symptoms" Type="nvarchar" Mode="In" />
+          <Parameter Name="temperature" Type="decimal" Mode="In" />
+          <Parameter Name="weight" Type="decimal" Mode="In" />
+          <Parameter Name="recommendations" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="GetLowStockMedicines" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="threshold" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetPatientHistory" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="patient_id" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="Хранилище veterclinicModelContainer">
+          <EntitySet Name="animal_types" EntityType="Self.animal_types" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="breeds" EntityType="Self.breeds" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="medicine_stocks" EntityType="Self.medicine_stocks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="medicines" EntityType="Self.medicines" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="notifications" EntityType="Self.notifications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="owners" EntityType="Self.owners" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="patients" EntityType="Self.patients" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="prescriptions" EntityType="Self.prescriptions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="roles" EntityType="Self.roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="users" EntityType="Self.users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="visits" EntityType="Self.visits" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_breeds_animal_types" Association="Self.FK_breeds_animal_types">
+            <End Role="animal_types" EntitySet="animal_types" />
+            <End Role="breeds" EntitySet="breeds" />
+          </AssociationSet>
+          <AssociationSet Name="FK_medicine_stocks_medicines" Association="Self.FK_medicine_stocks_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="medicine_stocks" EntitySet="medicine_stocks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notifications_medicines" Association="Self.FK_notifications_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="notifications" EntitySet="notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_animal_types" Association="Self.FK_patients_animal_types">
+            <End Role="animal_types" EntitySet="animal_types" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_breeds" Association="Self.FK_patients_breeds">
+            <End Role="breeds" EntitySet="breeds" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_owners" Association="Self.FK_patients_owners">
+            <End Role="owners" EntitySet="owners" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_prescriptions_medicines" Association="Self.FK_prescriptions_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="prescriptions" EntitySet="prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_prescriptions_visits" Association="Self.FK_prescriptions_visits">
+            <End Role="visits" EntitySet="visits" />
+            <End Role="prescriptions" EntitySet="prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_users_roles" Association="Self.FK_users_roles">
+            <End Role="roles" EntitySet="roles" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_visits_patients" Association="Self.FK_visits_patients">
+            <End Role="patients" EntitySet="patients" />
+            <End Role="visits" EntitySet="visits" />
+          </AssociationSet>
+          <AssociationSet Name="FK_visits_users" Association="Self.FK_visits_users">
+            <End Role="users" EntitySet="users" />
+            <End Role="visits" EntitySet="visits" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="veterclinicModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="animal_types">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="breeds" Relationship="Self.FK_breeds_animal_types" FromRole="animal_types" ToRole="breeds" />
+          <NavigationProperty Name="patients" Relationship="Self.FK_patients_animal_types" FromRole="animal_types" ToRole="patients" />
+        </EntityType>
+        <EntityType Name="breeds">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="animal_type_id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="animal_types" Relationship="Self.FK_breeds_animal_types" FromRole="breeds" ToRole="animal_types" />
+          <NavigationProperty Name="patients" Relationship="Self.FK_patients_breeds" FromRole="breeds" ToRole="patients" />
+        </EntityType>
+        <EntityType Name="medicine_stocks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="medicine_id" Type="Int32" Nullable="false" />
+          <Property Name="quantity" Type="Int32" Nullable="false" />
+          <Property Name="location" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="expiry_date" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="medicines" Relationship="Self.FK_medicine_stocks_medicines" FromRole="medicine_stocks" ToRole="medicines" />
+        </EntityType>
+        <EntityType Name="medicines">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="category" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="unit" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="price" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="min_stock" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="medicine_stocks" Relationship="Self.FK_medicine_stocks_medicines" FromRole="medicines" ToRole="medicine_stocks" />
+          <NavigationProperty Name="notifications" Relationship="Self.FK_notifications_medicines" FromRole="medicines" ToRole="notifications" />
+          <NavigationProperty Name="prescriptions" Relationship="Self.FK_prescriptions_medicines" FromRole="medicines" ToRole="prescriptions" />
+        </EntityType>
+        <EntityType Name="notifications">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="medicine_id" Type="Int32" Nullable="false" />
+          <Property Name="message" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="created_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="is_read" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="medicines" Relationship="Self.FK_notifications_medicines" FromRole="notifications" ToRole="medicines" />
+        </EntityType>
+        <EntityType Name="owners">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="first_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="last_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="address" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="patients" Relationship="Self.FK_patients_owners" FromRole="owners" ToRole="patients" />
+        </EntityType>
+        <EntityType Name="patients">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="owner_id" Type="Int32" Nullable="false" />
+          <Property Name="animal_type_id" Type="Int32" Nullable="false" />
+          <Property Name="breed_id" Type="Int32" />
+          <Property Name="birth_date" Type="DateTime" Precision="0" />
+          <Property Name="weight" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="color" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="distinctive_features" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="avatar_path" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="chip_number" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="animal_types" Relationship="Self.FK_patients_animal_types" FromRole="patients" ToRole="animal_types" />
+          <NavigationProperty Name="breeds" Relationship="Self.FK_patients_breeds" FromRole="patients" ToRole="breeds" />
+          <NavigationProperty Name="owners" Relationship="Self.FK_patients_owners" FromRole="patients" ToRole="owners" />
+          <NavigationProperty Name="visits" Relationship="Self.FK_visits_patients" FromRole="patients" ToRole="visits" />
+        </EntityType>
+        <EntityType Name="prescriptions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="visit_id" Type="Int32" Nullable="false" />
+          <Property Name="medicine_id" Type="Int32" Nullable="false" />
+          <Property Name="dosage" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="frequency" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="duration_days" Type="Int32" Nullable="false" />
+          <Property Name="quantity" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="medicines" Relationship="Self.FK_prescriptions_medicines" FromRole="prescriptions" ToRole="medicines" />
+          <NavigationProperty Name="visits" Relationship="Self.FK_prescriptions_visits" FromRole="prescriptions" ToRole="visits" />
+        </EntityType>
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="users" Relationship="Self.FK_users_roles" FromRole="roles" ToRole="users" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="first_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="middle_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="last_name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="date_of_birth" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="phone_number" Type="String" MaxLength="16" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="date_of_hire" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="role_id" Type="Int32" Nullable="false" />
+          <Property Name="login" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="roles" Relationship="Self.FK_users_roles" FromRole="users" ToRole="roles" />
+          <NavigationProperty Name="visits" Relationship="Self.FK_visits_users" FromRole="users" ToRole="visits" />
+        </EntityType>
+        <EntityType Name="visits">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="patient_id" Type="Int32" Nullable="false" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="visit_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="diagnosis" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="symptoms" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="temperature" Type="Decimal" Precision="4" Scale="2" />
+          <Property Name="weight" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="recommendations" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="next_visit_date" Type="DateTime" Precision="0" />
+          <Property Name="status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="patients" Relationship="Self.FK_visits_patients" FromRole="visits" ToRole="patients" />
+          <NavigationProperty Name="prescriptions" Relationship="Self.FK_prescriptions_visits" FromRole="visits" ToRole="prescriptions" />
+          <NavigationProperty Name="users" Relationship="Self.FK_visits_users" FromRole="visits" ToRole="users" />
+        </EntityType>
+        <Association Name="FK_breeds_animal_types">
+          <End Role="animal_types" Type="Self.animal_types" Multiplicity="1" />
+          <End Role="breeds" Type="Self.breeds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="animal_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="breeds">
+              <PropertyRef Name="animal_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_animal_types">
+          <End Role="animal_types" Type="Self.animal_types" Multiplicity="1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="animal_types">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="animal_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_breeds">
+          <End Role="breeds" Type="Self.breeds" Multiplicity="0..1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="breeds">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="breed_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_medicine_stocks_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="medicine_stocks" Type="Self.medicine_stocks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="medicine_stocks">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notifications_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="notifications" Type="Self.notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="notifications">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_prescriptions_medicines">
+          <End Role="medicines" Type="Self.medicines" Multiplicity="1" />
+          <End Role="prescriptions" Type="Self.prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="medicines">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="prescriptions">
+              <PropertyRef Name="medicine_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_patients_owners">
+          <End Role="owners" Type="Self.owners" Multiplicity="1" />
+          <End Role="patients" Type="Self.patients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="owners">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="patients">
+              <PropertyRef Name="owner_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_visits_patients">
+          <End Role="patients" Type="Self.patients" Multiplicity="1" />
+          <End Role="visits" Type="Self.visits" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="patients">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="visits">
+              <PropertyRef Name="patient_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_prescriptions_visits">
+          <End Role="visits" Type="Self.visits" Multiplicity="1" />
+          <End Role="prescriptions" Type="Self.prescriptions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="visits">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="prescriptions">
+              <PropertyRef Name="visit_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_users_roles">
+          <End Role="roles" Type="Self.roles" Multiplicity="1" />
+          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_visits_users">
+          <End Role="users" Type="Self.users" Multiplicity="1" />
+          <End Role="visits" Type="Self.visits" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="visits">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="veterclinicEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="animal_types" EntityType="Self.animal_types" />
+          <EntitySet Name="breeds" EntityType="Self.breeds" />
+          <EntitySet Name="medicine_stocks" EntityType="Self.medicine_stocks" />
+          <EntitySet Name="medicines" EntityType="Self.medicines" />
+          <EntitySet Name="notifications" EntityType="Self.notifications" />
+          <EntitySet Name="owners" EntityType="Self.owners" />
+          <EntitySet Name="patients" EntityType="Self.patients" />
+          <EntitySet Name="prescriptions" EntityType="Self.prescriptions" />
+          <EntitySet Name="roles" EntityType="Self.roles" />
+          <EntitySet Name="users" EntityType="Self.users" />
+          <EntitySet Name="visits" EntityType="Self.visits" />
+          <AssociationSet Name="FK_breeds_animal_types" Association="Self.FK_breeds_animal_types">
+            <End Role="animal_types" EntitySet="animal_types" />
+            <End Role="breeds" EntitySet="breeds" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_animal_types" Association="Self.FK_patients_animal_types">
+            <End Role="animal_types" EntitySet="animal_types" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_breeds" Association="Self.FK_patients_breeds">
+            <End Role="breeds" EntitySet="breeds" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_medicine_stocks_medicines" Association="Self.FK_medicine_stocks_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="medicine_stocks" EntitySet="medicine_stocks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notifications_medicines" Association="Self.FK_notifications_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="notifications" EntitySet="notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_prescriptions_medicines" Association="Self.FK_prescriptions_medicines">
+            <End Role="medicines" EntitySet="medicines" />
+            <End Role="prescriptions" EntitySet="prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_patients_owners" Association="Self.FK_patients_owners">
+            <End Role="owners" EntitySet="owners" />
+            <End Role="patients" EntitySet="patients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_visits_patients" Association="Self.FK_visits_patients">
+            <End Role="patients" EntitySet="patients" />
+            <End Role="visits" EntitySet="visits" />
+          </AssociationSet>
+          <AssociationSet Name="FK_prescriptions_visits" Association="Self.FK_prescriptions_visits">
+            <End Role="visits" EntitySet="visits" />
+            <End Role="prescriptions" EntitySet="prescriptions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_users_roles" Association="Self.FK_users_roles">
+            <End Role="roles" EntitySet="roles" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_visits_users" Association="Self.FK_visits_users">
+            <End Role="users" EntitySet="users" />
+            <End Role="visits" EntitySet="visits" />
+          </AssociationSet>
+          <FunctionImport Name="AddVisit" ReturnType="Collection(Decimal)">
+            <Parameter Name="patient_id" Mode="In" Type="Int32" />
+            <Parameter Name="user_id" Mode="In" Type="Int32" />
+            <Parameter Name="diagnosis" Mode="In" Type="String" />
+            <Parameter Name="symptoms" Mode="In" Type="String" />
+            <Parameter Name="temperature" Mode="In" Type="Decimal" />
+            <Parameter Name="weight" Mode="In" Type="Decimal" />
+            <Parameter Name="recommendations" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="GetLowStockMedicines" ReturnType="Collection(veterclinicModel.GetLowStockMedicines_Result)">
+            <Parameter Name="threshold" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="GetPatientHistory" ReturnType="Collection(veterclinicModel.GetPatientHistory_Result)">
+            <Parameter Name="patient_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="GetLowStockMedicines_Result">
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="String" Name="name" Nullable="false" MaxLength="100" />
+          <Property Type="Int32" Name="total_quantity" Nullable="true" />
+          <Property Type="Int32" Name="min_stock" Nullable="false" />
+          <Property Type="String" Name="unit" Nullable="false" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="GetPatientHistory_Result">
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="DateTime" Name="visit_date" Nullable="false" Precision="23" />
+          <Property Type="String" Name="diagnosis" Nullable="false" MaxLength="500" />
+          <Property Type="String" Name="symptoms" Nullable="true" MaxLength="1000" />
+          <Property Type="Decimal" Name="temperature" Nullable="true" Precision="4" Scale="2" />
+          <Property Type="Decimal" Name="weight" Nullable="true" Precision="5" Scale="2" />
+          <Property Type="String" Name="recommendations" Nullable="true" MaxLength="1000" />
+          <Property Type="String" Name="vet_name" Nullable="true" MaxLength="55" />
+          <Property Type="Int32" Name="prescriptions_count" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище veterclinicModelContainer" CdmEntityContainer="veterclinicEntities">
+          <EntitySetMapping Name="animal_types">
+            <EntityTypeMapping TypeName="veterclinicModel.animal_types">
+              <MappingFragment StoreEntitySet="animal_types">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="breeds">
+            <EntityTypeMapping TypeName="veterclinicModel.breeds">
+              <MappingFragment StoreEntitySet="breeds">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="animal_type_id" ColumnName="animal_type_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="medicine_stocks">
+            <EntityTypeMapping TypeName="veterclinicModel.medicine_stocks">
+              <MappingFragment StoreEntitySet="medicine_stocks">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="medicine_id" ColumnName="medicine_id" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="location" ColumnName="location" />
+                <ScalarProperty Name="expiry_date" ColumnName="expiry_date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="medicines">
+            <EntityTypeMapping TypeName="veterclinicModel.medicines">
+              <MappingFragment StoreEntitySet="medicines">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="category" ColumnName="category" />
+                <ScalarProperty Name="unit" ColumnName="unit" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="min_stock" ColumnName="min_stock" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="notifications">
+            <EntityTypeMapping TypeName="veterclinicModel.notifications">
+              <MappingFragment StoreEntitySet="notifications">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="medicine_id" ColumnName="medicine_id" />
+                <ScalarProperty Name="message" ColumnName="message" />
+                <ScalarProperty Name="created_date" ColumnName="created_date" />
+                <ScalarProperty Name="is_read" ColumnName="is_read" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="owners">
+            <EntityTypeMapping TypeName="veterclinicModel.owners">
+              <MappingFragment StoreEntitySet="owners">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="first_name" ColumnName="first_name" />
+                <ScalarProperty Name="last_name" ColumnName="last_name" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="address" ColumnName="address" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="patients">
+            <EntityTypeMapping TypeName="veterclinicModel.patients">
+              <MappingFragment StoreEntitySet="patients">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="owner_id" ColumnName="owner_id" />
+                <ScalarProperty Name="animal_type_id" ColumnName="animal_type_id" />
+                <ScalarProperty Name="breed_id" ColumnName="breed_id" />
+                <ScalarProperty Name="birth_date" ColumnName="birth_date" />
+                <ScalarProperty Name="weight" ColumnName="weight" />
+                <ScalarProperty Name="color" ColumnName="color" />
+                <ScalarProperty Name="distinctive_features" ColumnName="distinctive_features" />
+                <ScalarProperty Name="avatar_path" ColumnName="avatar_path" />
+                <ScalarProperty Name="chip_number" ColumnName="chip_number" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="prescriptions">
+            <EntityTypeMapping TypeName="veterclinicModel.prescriptions">
+              <MappingFragment StoreEntitySet="prescriptions">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="visit_id" ColumnName="visit_id" />
+                <ScalarProperty Name="medicine_id" ColumnName="medicine_id" />
+                <ScalarProperty Name="dosage" ColumnName="dosage" />
+                <ScalarProperty Name="frequency" ColumnName="frequency" />
+                <ScalarProperty Name="duration_days" ColumnName="duration_days" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="roles">
+            <EntityTypeMapping TypeName="veterclinicModel.roles">
+              <MappingFragment StoreEntitySet="roles">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="veterclinicModel.users">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="first_name" ColumnName="first_name" />
+                <ScalarProperty Name="middle_name" ColumnName="middle_name" />
+                <ScalarProperty Name="last_name" ColumnName="last_name" />
+                <ScalarProperty Name="date_of_birth" ColumnName="date_of_birth" />
+                <ScalarProperty Name="phone_number" ColumnName="phone_number" />
+                <ScalarProperty Name="date_of_hire" ColumnName="date_of_hire" />
+                <ScalarProperty Name="role_id" ColumnName="role_id" />
+                <ScalarProperty Name="login" ColumnName="login" />
+                <ScalarProperty Name="password" ColumnName="password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="visits">
+            <EntityTypeMapping TypeName="veterclinicModel.visits">
+              <MappingFragment StoreEntitySet="visits">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="patient_id" ColumnName="patient_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="visit_date" ColumnName="visit_date" />
+                <ScalarProperty Name="diagnosis" ColumnName="diagnosis" />
+                <ScalarProperty Name="symptoms" ColumnName="symptoms" />
+                <ScalarProperty Name="temperature" ColumnName="temperature" />
+                <ScalarProperty Name="weight" ColumnName="weight" />
+                <ScalarProperty Name="recommendations" ColumnName="recommendations" />
+                <ScalarProperty Name="next_visit_date" ColumnName="next_visit_date" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="AddVisit" FunctionName="Хранилище veterclinicModel.AddVisit" />
+          <FunctionImportMapping FunctionImportName="GetLowStockMedicines" FunctionName="Хранилище veterclinicModel.GetLowStockMedicines">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="veterclinicModel.GetLowStockMedicines_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="total_quantity" ColumnName="total_quantity" />
+                <ScalarProperty Name="min_stock" ColumnName="min_stock" />
+                <ScalarProperty Name="unit" ColumnName="unit" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetPatientHistory" FunctionName="Хранилище veterclinicModel.GetPatientHistory">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="veterclinicModel.GetPatientHistory_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="visit_date" ColumnName="visit_date" />
+                <ScalarProperty Name="diagnosis" ColumnName="diagnosis" />
+                <ScalarProperty Name="symptoms" ColumnName="symptoms" />
+                <ScalarProperty Name="temperature" ColumnName="temperature" />
+                <ScalarProperty Name="weight" ColumnName="weight" />
+                <ScalarProperty Name="recommendations" ColumnName="recommendations" />
+                <ScalarProperty Name="vet_name" ColumnName="vet_name" />
+                <ScalarProperty Name="prescriptions_count" ColumnName="prescriptions_count" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

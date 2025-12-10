@@ -1,0 +1,40 @@
+﻿<Page x:Class="VetClinic.Pages.PatientsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Пациенты">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button x:Name="btnAddPatient" Content="Добавить" 
+                    Style="{StaticResource NavButtonStyle}"
+                    Click="BtnAddPatient_Click"/>
+            <Button x:Name="btnEditPatient" Content="Изменить" Margin="10,0,0,0"
+                    Style="{StaticResource NavButtonStyle}"
+                    Click="BtnEditPatient_Click"/>
+            <Button x:Name="btnDeletePatient" Content="Удалить" Margin="10,0,0,0"
+                    Style="{StaticResource NavButtonStyle}"
+                    Click="BtnDeletePatient_Click"/>
+            <Button x:Name="btnViewHistory" Content="История" Margin="10,0,0,0"
+                    Style="{StaticResource NavButtonStyle}"
+                    Click="BtnViewHistory_Click"/>
+        </StackPanel>
+
+        <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Кличка" Binding="{Binding Name}" Width="100"/>
+                <DataGridTextColumn Header="Вид" Binding="{Binding AnimalType.Name}" Width="80"/>
+                <DataGridTextColumn Header="Порода" Binding="{Binding Breed.Name}" Width="100"/>
+                <DataGridTextColumn Header="Владелец" Binding="{Binding Owner.FullName}" Width="150"/>
+                <DataGridTextColumn Header="Возраст" Binding="{Binding AgeFormatted}" Width="80"/>
+                <DataGridTextColumn Header="Вес" Binding="{Binding Weight, StringFormat=N2}" Width="60"/>
+                <DataGridTextColumn Header="Цвет" Binding="{Binding Color}" Width="80"/>
+                <DataGridTextColumn Header="Особые приметы" Binding="{Binding DistinctiveFeatures}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page> 

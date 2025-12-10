@@ -1,0 +1,40 @@
+﻿<Window x:Class="VetClinic.Dialogs.VisitEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Новый приём" Height="500" Width="500">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Пациент:" Grid.Row="0"/>
+        <ComboBox x:Name="cmbPatients" DisplayMemberPath="Name" SelectedValuePath="Id" 
+                  SelectedValue="{Binding PatientId}" Grid.Row="1" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Диагноз:" Grid.Row="2"/>
+        <TextBox x:Name="txtDiagnosis" Text="{Binding Diagnosis}" Grid.Row="3" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Симптомы:" Grid.Row="4"/>
+        <TextBox x:Name="txtSymptoms" Text="{Binding Symptoms}" Grid.Row="5" 
+                 Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Температура:" Grid.Row="6"/>
+        <TextBox x:Name="txtTemperature" Text="{Binding Temperature}" Grid.Row="7" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Рекомендации:" Grid.Row="8"/>
+        <TextBox x:Name="txtRecommendations" Text="{Binding Recommendations}" Grid.Row="9"
+                 Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Отмена" Width="80" Margin="0,0,10,0" Click="BtnCancel_Click"/>
+            <Button Content="Сохранить" Width="80" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

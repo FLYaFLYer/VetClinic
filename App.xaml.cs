@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using VetClinic.Data;
 
 namespace VetClinic
 {
-    /// <summary>
-    /// Логика взаимодействия для App.xaml
-    /// </summary>
     public partial class App : Application
     {
+        public static string CurrentRole { get; set; }
+        public static Models.User CurrentUser { get; set; }
+
+        public const string VetRole = "Ветеринар";
+        public const string AdminRole = "Администратор";
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Инициализируем базу данных при запуске приложения
+            DatabaseHelper.InitializeDatabase();
+        }
     }
 }

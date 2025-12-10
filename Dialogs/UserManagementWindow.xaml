@@ -1,0 +1,66 @@
+﻿<Window x:Class="VetClinic.Dialogs.UserManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Управление пользователями" Height="500" Width="900"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Панель кнопок -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
+            <Button x:Name="btnAddUser" 
+                    Content="Добавить" 
+                    Padding="10,5" 
+                    Margin="0,0,10,0"
+                    Click="BtnAddUser_Click"/>
+            <Button x:Name="btnEditUser" 
+                    Content="Изменить" 
+                    Padding="10,5" 
+                    Margin="0,0,10,0"
+                    Click="BtnEditUser_Click"/>
+            <Button x:Name="btnDeleteUser" 
+                    Content="Удалить" 
+                    Padding="10,5"
+                    Margin="0,0,10,0"
+                    Click="BtnDeleteUser_Click"/>
+            <Button x:Name="btnChangePassword" 
+                    Content="Сменить пароль" 
+                    Padding="10,5" 
+                    Click="BtnChangePassword_Click"/>
+        </StackPanel>
+
+        <!-- Таблица пользователей -->
+        <DataGrid x:Name="dataGrid" Grid.Row="1" 
+                  AutoGenerateColumns="False"
+                  SelectionMode="Single"
+                  IsReadOnly="True"
+                  Margin="10,0,10,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}" Width="120"/>
+                <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="120"/>
+                <DataGridTextColumn Header="Отчество" Binding="{Binding MiddleName}" Width="120"/>
+                <DataGridTextColumn Header="Должность" Binding="{Binding Role.Name}" Width="150"/>
+                <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="100"/>
+                <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumber}" Width="120"/>
+                <DataGridTextColumn Header="Дата приема" 
+                                     Binding="{Binding DateOfHire, StringFormat=dd.MM.yyyy}" 
+                                     Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Кнопка закрытия -->
+        <Button Grid.Row="2" 
+                Content="Закрыть" 
+                HorizontalAlignment="Right" 
+                Margin="10" 
+                Padding="10,5"
+                Width="80"
+                Click="BtnCancel_Click"/>
+    </Grid>
+</Window>

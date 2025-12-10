@@ -1,0 +1,57 @@
+﻿<Window x:Class="VetClinic.Dialogs.PatientEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Редактирование пациента" Height="500" Width="500">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Кличка:" Grid.Row="0"/>
+        <TextBox x:Name="txtName" Text="{Binding PatientName}" Grid.Row="1" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Владелец:" Grid.Row="2"/>
+        <ComboBox x:Name="cmbOwners" DisplayMemberPath="FullName" SelectedValuePath="Id" 
+                  SelectedValue="{Binding OwnerId}" Grid.Row="3" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Вид животного:" Grid.Row="4"/>
+        <ComboBox x:Name="cmbAnimalTypes" DisplayMemberPath="Name" SelectedValuePath="Id" 
+                  SelectedValue="{Binding AnimalTypeId}" Grid.Row="5" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Порода:" Grid.Row="6"/>
+        <ComboBox x:Name="cmbBreeds" DisplayMemberPath="Name" SelectedValuePath="Id" 
+                  SelectedValue="{Binding BreedId}" Grid.Row="7" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Дата рождения:" Grid.Row="8"/>
+        <DatePicker x:Name="dpBirthDate" SelectedDate="{Binding BirthDate}" Grid.Row="9" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Вес (кг):" Grid.Row="10"/>
+        <TextBox x:Name="txtWeight" Text="{Binding Weight}" Grid.Row="11" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Цвет:" Grid.Row="12"/>
+        <TextBox x:Name="txtColor" Text="{Binding Color}" Grid.Row="13" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Номер чипа:" Grid.Row="14"/>
+        <TextBox x:Name="txtChipNumber" Text="{Binding ChipNumber}" Grid.Row="15" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Особые приметы:" Grid.Row="16"/>
+        <TextBox x:Name="txtDistinctiveFeatures" Text="{Binding DistinctiveFeatures}" 
+                 Grid.Row="17" Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="18" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Отмена" Width="80" Margin="0,0,10,0" Click="BtnCancel_Click"/>
+            <Button Content="Сохранить" Width="80" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
