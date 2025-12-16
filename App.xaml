@@ -3,46 +3,151 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="LoginWindow.xaml">
     <Application.Resources>
-        <!-- Основной стиль кнопок -->
+        <!-- Зелёный цветовой акцент -->
+        <Color x:Key="PrimaryGreenColor">#FF4CAF50</Color>
+        <Color x:Key="PrimaryGreenDarkColor">#FF388E3C</Color>
+        <Color x:Key="PrimaryGreenLightColor">#FF81C784</Color>
+        <Color x:Key="AccentGreenColor">#FF8BC34A</Color>
+        <Color x:Key="AccentGreenDarkColor">#FF689F38</Color>
+
+        <!-- Кисти -->
+        <SolidColorBrush x:Key="PrimaryGreenBrush" Color="{StaticResource PrimaryGreenColor}"/>
+        <SolidColorBrush x:Key="PrimaryGreenDarkBrush" Color="{StaticResource PrimaryGreenDarkColor}"/>
+        <SolidColorBrush x:Key="PrimaryGreenLightBrush" Color="{StaticResource PrimaryGreenLightColor}"/>
+        <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreenColor}"/>
+        <SolidColorBrush x:Key="AccentGreenDarkBrush" Color="{StaticResource AccentGreenDarkColor}"/>
+
+        <!-- Современный стиль для кнопок -->
+        <Style TargetType="Button" x:Key="ModernButtonStyle">
+            <Setter Property="Background" Value="{StaticResource PrimaryGreenBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryGreenDarkBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Стиль для кнопок навигации -->
         <Style TargetType="Button" x:Key="NavButtonStyle">
+            <Setter Property="Background" Value="#FF4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF388E3C"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="110"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFDDDDDD"/>
+                    <Setter Property="Background" Value="#FF388E3C"/>
+                    <Setter Property="BorderBrush" Value="#FF2E7D32"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF2E7D32"/>
+                    <Setter Property="BorderBrush" Value="#FF1B5E20"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- Стиль для кнопок в диалогах -->
-        <Style TargetType="Button" x:Key="DialogButtonStyle">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="10,5"/>
+        <Style TargetType="Button" x:Key="DialogButtonStyle" BasedOn="{StaticResource ModernButtonStyle}">
             <Setter Property="MinWidth" Value="80"/>
-            <Setter Property="Background" Value="#FF1976D2"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FF0D47A1"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+
+        <!-- Стиль для кнопок отмены -->
+        <Style TargetType="Button" x:Key="CancelButtonStyle" BasedOn="{StaticResource DialogButtonStyle}">
+            <Setter Property="Background" Value="#FFf44336"/>
+            <Setter Property="BorderBrush" Value="#FFd32f2f"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF1565C0"/>
+                    <Setter Property="Background" Value="#FFd32f2f"/>
+                    <Setter Property="BorderBrush" Value="#FFc62828"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- Стиль для DataGrid -->
         <Style TargetType="DataGrid">
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#FFEEEEEE"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#FFF9F9F9"/>
+            <Setter Property="BorderBrush" Value="#FFDDDDDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
-        <!-- Стиль для TextBox с валидацией -->
-        <Style TargetType="TextBox" x:Key="ValidatingTextBox">
+        <!-- Стиль для заголовков DataGrid -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#FF4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderThickness" Value="0,0,0,0"/>
+        </Style>
+
+        <!-- Стиль для панелей с кнопками -->
+        <Style TargetType="StackPanel" x:Key="ButtonPanelStyle">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+
+        <!-- Стиль для полей поиска -->
+        <Style TargetType="TextBox" x:Key="SearchTextBoxStyle">
+            <Setter Property="Width" Value="220"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Стиль для DatePicker -->
+        <Style TargetType="DatePicker" x:Key="DatePickerStyle">
+            <Setter Property="Width" Value="140"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Стиль для TextBlock подписи -->
+        <Style TargetType="TextBlock" x:Key="LabelTextBlockStyle">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,5,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,2,0,10"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
                     <Setter Property="ToolTip" 
@@ -53,5 +158,30 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,2,0,10"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Стиль для заголовков в диалогах -->
+        <Style TargetType="TextBlock" x:Key="DialogHeaderStyle">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <!-- Стиль для окон -->
+        <Style TargetType="Window">
+            <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
+            <Setter Property="ResizeMode" Value="CanResize"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
     </Application.Resources>
 </Application>

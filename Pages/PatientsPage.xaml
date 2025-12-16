@@ -8,7 +8,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <Button x:Name="btnAddPatient" Content="Добавить" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddPatient_Click"/>
@@ -29,7 +29,11 @@
                 <DataGridTextColumn Header="Кличка" Binding="{Binding Name}" Width="100"/>
                 <DataGridTextColumn Header="Вид" Binding="{Binding AnimalType.Name}" Width="80"/>
                 <DataGridTextColumn Header="Порода" Binding="{Binding Breed.Name}" Width="100"/>
-                <DataGridTextColumn Header="Владелец" Binding="{Binding Owner.FullName}" Width="150"/>
+                <DataGridTextColumn Header="Владелец" Width="150">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Owner.FullName" Mode="OneWay"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Возраст" Binding="{Binding AgeFormatted}" Width="80"/>
                 <DataGridTextColumn Header="Вес" Binding="{Binding Weight, StringFormat=N2}" Width="60"/>
                 <DataGridTextColumn Header="Цвет" Binding="{Binding Color}" Width="80"/>
@@ -37,4 +41,4 @@
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
-</Page> 
+</Page>

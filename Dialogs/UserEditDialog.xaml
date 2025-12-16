@@ -1,108 +1,160 @@
 ﻿<Window x:Class="VetClinic.Dialogs.UserEditDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Редактирование пользователя" Height="600" Width="500"
-        WindowStartupLocation="CenterOwner">
+        Title="Редактирование пользователя" 
+        Height="650" 
+        Width="520"
+        WindowStartupLocation="CenterOwner"
+        Background="White"
+        ResizeMode="NoResize">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+            <StackPanel>
+                <!-- Заголовок -->
+                <TextBlock Text="Редактирование пользователя" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,20"
+                           Foreground="{StaticResource PrimaryGreenDarkBrush}"/>
 
-            <!-- Логин -->
-            <TextBlock Text="Логин:" Grid.Row="0" FontWeight="Bold"/>
-            <TextBox x:Name="txtLogin" Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
-                     Grid.Row="1" Margin="0,2,0,10"/>
+                <!-- Логин -->
+                <TextBlock Text="Логин:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <TextBox x:Name="txtLogin" 
+                         Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" Padding="8,4"/>
 
-            <!-- Пароль -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal">
-                <TextBlock Text="Пароль:" FontWeight="Bold" VerticalAlignment="Center"/>
-                <Button x:Name="btnGeneratePassword" Content="Сгенерировать" Margin="10,0,0,0" Padding="5,2" 
-                        Click="BtnGeneratePassword_Click" VerticalAlignment="Center"/>
-                <Button x:Name="btnCopyPassword" Content="Копировать" Margin="5,0,0,0" Padding="5,2" 
-                        Click="BtnCopyPassword_Click" VerticalAlignment="Center"/>
+                <!-- Пароль -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Пароль:" 
+                               FontWeight="SemiBold" 
+                               Margin="0,10,0,5"
+                               Grid.Column="0"/>
+
+                    <StackPanel Grid.Column="1" 
+                                Orientation="Horizontal" 
+                                HorizontalAlignment="Right"
+                                Margin="0,5,0,0">
+                        <Button x:Name="btnGeneratePassword" 
+                                Content="Сгенерировать" 
+                                Margin="5,0,0,0" Padding="8,4" Height="28"
+                                Click="BtnGeneratePassword_Click"/>
+                        <Button x:Name="btnCopyPassword" 
+                                Content="Копировать" 
+                                Margin="5,0,0,0" Padding="8,4" Height="28"
+                                Click="BtnCopyPassword_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Поле пароля -->
+                    <PasswordBox x:Name="pwdPassword" 
+                                 Grid.Column="0"
+                                 PasswordChanged="PwdPassword_PasswordChanged"
+                                 Height="34"
+                                 Padding="8,4"/>
+
+                    <!-- Текстовое поле для отображения пароля -->
+                    <TextBox x:Name="txtPasswordVisible" 
+                             Grid.Column="0"
+                             Visibility="Collapsed"
+                             Height="34" Padding="8,4"/>
+
+                    <CheckBox x:Name="chkShowPassword" 
+                              Grid.Column="1" 
+                              Content="Показать"
+                              Margin="10,0,0,0" 
+                              VerticalAlignment="Center"
+                              Checked="ChkShowPassword_Checked"
+                              Unchecked="ChkShowPassword_Unchecked"/>
+                </Grid>
+
+                <!-- Фамилия -->
+                <TextBlock Text="Фамилия:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <TextBox x:Name="txtLastName" 
+                         Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" Padding="8,4"/>
+
+                <!-- Имя -->
+                <TextBlock Text="Имя:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <TextBox x:Name="txtFirstName" 
+                         Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" Padding="8,4"/>
+
+                <!-- Отчество -->
+                <TextBlock Text="Отчество:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <TextBox x:Name="txtMiddleName" 
+                         Text="{Binding MiddleName, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" Padding="8,4"/>
+
+                <!-- Телефон -->
+                <TextBlock Text="Телефон (формат: +7 (XXX) XXX-XX-XX):" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <TextBox x:Name="txtPhoneNumber" 
+                         Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" Padding="8,4"
+                         TextChanged="TxtPhoneNumber_TextChanged"/>
+
+                <!-- Дата рождения -->
+                <TextBlock Text="Дата рождения:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <DatePicker x:Name="dpDateOfBirth" 
+                            SelectedDate="{Binding DateOfBirth}" 
+                            Height="34"/>
+
+                <!-- Дата приема -->
+                <TextBlock Text="Дата приема:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <DatePicker x:Name="dpDateOfHire" 
+                            SelectedDate="{Binding DateOfHire}" 
+                            Height="34"/>
+
+                <!-- Роль -->
+                <TextBlock Text="Роль:" 
+                           FontWeight="SemiBold" 
+                           Margin="0,10,0,5"/>
+                <ComboBox x:Name="cmbRoles" 
+                          DisplayMemberPath="Name" 
+                          SelectedValuePath="Id" 
+                          SelectedValue="{Binding RoleId}" 
+                          Height="34" Padding="8,4"/>
+
+                <!-- Кнопки -->
+                <Border BorderBrush="#FFEEEEEE" BorderThickness="0,1,0,0" Margin="0,30,0,0">
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Right" 
+                                Margin="0,20,0,0">
+                        <Button Content="Отмена" 
+                                Style="{StaticResource CancelButtonStyle}"
+                                Click="BtnCancel_Click"/>
+                        <Button Content="Сохранить" 
+                                Style="{StaticResource DialogButtonStyle}"
+                                Margin="10,0,0,0"
+                                Click="BtnSave_Click"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
-
-            <Grid Grid.Row="3" Margin="0,2,0,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <PasswordBox x:Name="pwdPassword" Grid.Column="0"
-                             PasswordChanged="PwdPassword_PasswordChanged"
-                             Visibility="Visible"/>
-                <TextBox x:Name="txtPasswordVisible" Grid.Column="0"
-                         Text="{Binding PasswordPlainText, UpdateSourceTrigger=PropertyChanged}"
-                         Visibility="Collapsed"/>
-
-                <CheckBox x:Name="chkShowPassword" Grid.Column="1" Content="Показать"
-                          Margin="5,0,0,0" VerticalAlignment="Center"
-                          Checked="ChkShowPassword_Checked"
-                          Unchecked="ChkShowPassword_Unchecked"/>
-            </Grid>
-
-            <!-- Фамилия -->
-            <TextBlock Text="Фамилия:" Grid.Row="4" FontWeight="Bold"/>
-            <TextBox x:Name="txtLastName" Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" 
-                     Grid.Row="5" Margin="0,2,0,10"/>
-
-            <!-- Имя -->
-            <TextBlock Text="Имя:" Grid.Row="6" FontWeight="Bold"/>
-            <TextBox x:Name="txtFirstName" Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" 
-                     Grid.Row="7" Margin="0,2,0,10"/>
-
-            <!-- Отчество -->
-            <TextBlock Text="Отчество:" Grid.Row="8" FontWeight="Bold"/>
-            <TextBox x:Name="txtMiddleName" Text="{Binding MiddleName, UpdateSourceTrigger=PropertyChanged}" 
-                     Grid.Row="9" Margin="0,2,0,10"/>
-
-            <!-- Телефон -->
-            <TextBlock Text="Телефон:" Grid.Row="10" FontWeight="Bold"/>
-            <TextBox x:Name="txtPhoneNumber" Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
-                     Grid.Row="11" Margin="0,2,0,10"/>
-
-            <!-- Дата рождения -->
-            <TextBlock Text="Дата рождения:" Grid.Row="12" FontWeight="Bold"/>
-            <DatePicker x:Name="dpDateOfBirth" SelectedDate="{Binding DateOfBirth}" 
-                        Grid.Row="13" Margin="0,2,0,10"/>
-
-            <!-- Дата приема -->
-            <TextBlock Text="Дата приема:" Grid.Row="14" FontWeight="Bold"/>
-            <DatePicker x:Name="dpDateOfHire" SelectedDate="{Binding DateOfHire}" 
-                        Grid.Row="15" Margin="0,2,0,10"/>
-
-            <!-- Роль -->
-            <TextBlock Text="Роль:" Grid.Row="16" FontWeight="Bold"/>
-            <ComboBox x:Name="cmbRoles" DisplayMemberPath="Name" SelectedValuePath="Id" 
-                      SelectedValue="{Binding RoleId}" Grid.Row="17" Margin="0,2,0,20"/>
-
-            <!-- Кнопки -->
-            <StackPanel Grid.Row="19" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <Button Content="Отмена" Width="80" Margin="0,0,10,0" Click="BtnCancel_Click"/>
-                <Button Content="Сохранить" Width="80" Click="BtnSave_Click"/>
-            </StackPanel>
-        </Grid>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Window>

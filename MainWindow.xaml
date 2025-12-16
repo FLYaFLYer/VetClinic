@@ -5,86 +5,146 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Ветеринарная клиника" 
-        Height="600" 
-        Width="1000"
-        WindowStartupLocation="CenterScreen">
+        Height="700" 
+        Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="White">
+
+    <Window.Resources>
+        <!-- Стиль для красивой кнопки выхода -->
+        <Style TargetType="Button" x:Key="LogoutButtonStyle">
+            <Setter Property="Background" Value="#FFf44336"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFd32f2f"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFd32f2f"/>
+                    <Setter Property="BorderBrush" Value="#FFc62828"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FFb71c1c"/>
+                    <Setter Property="BorderBrush" Value="#FFb71c1c"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для кнопок боковой панели -->
+        <Style TargetType="Button" x:Key="SidebarButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Border Grid.Row="0" Background="#FF4CAF50" Padding="10">
+        <!-- Верхняя панель -->
+        <Border Height="60" Background="#FF4CAF50" VerticalAlignment="Top">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="🐾" FontSize="24" Margin="0,0,10,0" VerticalAlignment="Center"/>
                     <TextBlock Text="Ветеринарная клиника" 
                                FontSize="20" 
                                Foreground="White"
+                               FontWeight="Bold"
                                VerticalAlignment="Center"/>
 
                     <TextBlock x:Name="tbUserInfo" 
-                               Margin="20,0,0,0"
+                               Margin="30,0,0,0"
                                Foreground="White"
+                               FontSize="14"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center">
                     <Button x:Name="btnNotifications" 
                             Content="🔔" 
-                            Margin="10,0,10,0" 
-                            Padding="10,5"
+                            Margin="0,0,20,0" 
+                            Padding="10"
                             Click="BtnNotifications_Click"
                             Background="Transparent"
                             Foreground="White"
-                            BorderThickness="0"/>
+                            BorderThickness="0"
+                            FontSize="16"
+                            Cursor="Hand"
+                            ToolTip="Уведомления"/>
 
                     <Button x:Name="btnLogout" 
                             Content="Выход" 
-                            Padding="10,5"
+                            Padding="12,6"
                             Click="BtnLogout_Click"
-                            Style="{StaticResource NavButtonStyle}"
-                            Background="Transparent"
-                            Foreground="White"/>
+                            Style="{StaticResource LogoutButtonStyle}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1">
+        <!-- Основное содержимое -->
+        <Grid Margin="0,60,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Width="200" Background="#FFEEEEEE">
-                <StackPanel>
-                    <Button x:Name="btnPatients" Content="Пациенты" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="NavButton_Click"/>
-                    <Button x:Name="btnMedicines" Content="Лекарства" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="NavButton_Click"/>
-                    <Button x:Name="btnVisits" Content="Приёмы" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="NavButton_Click"/>
-                    <Button x:Name="btnOwners" Content="Владельцы" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="NavButton_Click"/>
-                    <Button x:Name="btnReports" Content="Отчёты" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="NavButton_Click"/>
-                    <Button x:Name="btnUsers" Content="Пользователи" 
-                            Style="{StaticResource NavButtonStyle}"
+            <!-- Левая панель навигации -->
+            <Border Grid.Column="0" 
+                    Background="#FFF9F9F9" 
+                    BorderBrush="#FFEEEEEE" 
+                    BorderThickness="0,0,1,0">
+                <StackPanel Margin="0,20,0,0">
+                    <Button x:Name="btnPatients" 
+                            Content="🐶 Пациенты" 
+                            Style="{StaticResource SidebarButton}"
                             Click="NavButton_Click"
+                            Height="48"/>
+                    <Button x:Name="btnMedicines" 
+                            Content="💊 Лекарства" 
+                            Style="{StaticResource SidebarButton}"
+                            Click="NavButton_Click"
+                            Height="48"/>
+                    <Button x:Name="btnVisits" 
+                            Content="📋 Приёмы" 
+                            Style="{StaticResource SidebarButton}"
+                            Click="NavButton_Click"
+                            Height="48"/>
+                    <Button x:Name="btnOwners" 
+                            Content="👤 Владельцы" 
+                            Style="{StaticResource SidebarButton}"
+                            Click="NavButton_Click"
+                            Height="48"/>
+                    <Button x:Name="btnReports" 
+                            Content="📊 Отчёты" 
+                            Style="{StaticResource SidebarButton}"
+                            Click="NavButton_Click"
+                            Height="48"/>
+                    <Button x:Name="btnUsers" 
+                            Content="👥 Пользователи" 
+                            Style="{StaticResource SidebarButton}"
+                            Click="NavButton_Click"
+                            Height="48"
                             Visibility="Collapsed"/>
                 </StackPanel>
             </Border>
 
+            <!-- Основная область -->
             <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>

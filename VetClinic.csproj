@@ -291,7 +291,7 @@
     <Resource Include="Resources\Images\avatar_placeholder.png" />
     <Resource Include="Resources\Images\logo.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Content Include="MainDB.Context.tt">

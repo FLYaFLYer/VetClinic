@@ -10,6 +10,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -32,9 +36,9 @@
         <TextBox x:Name="txtRecommendations" Text="{Binding Recommendations}" Grid.Row="9"
                  Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20"/>
 
-        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Отмена" Width="80" Margin="0,0,10,0" Click="BtnCancel_Click"/>
-            <Button Content="Сохранить" Width="80" Click="BtnSave_Click"/>
+        <StackPanel Grid.Row="11" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Отмена" Style="{StaticResource DialogButtonStyle}" Click="BtnCancel_Click"/>
+            <Button Content="Сохранить" Style="{StaticResource DialogButtonStyle}" Click="BtnSave_Click"/>
         </StackPanel>
     </Grid>
 </Window>

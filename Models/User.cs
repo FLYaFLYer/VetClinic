@@ -86,7 +86,7 @@ namespace VetClinic.Models
         }
 
         [Required(ErrorMessage = "Телефон обязателен")]
-        [StringLength(16, ErrorMessage = "Телефон не должен превышать 16 символов")]
+        [StringLength(20, ErrorMessage = "Телефон не должен превышать 20 символов")]
         [Column("phone_number")]
         public string PhoneNumber
         {

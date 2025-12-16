@@ -8,20 +8,24 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+        <!-- Панель с кнопками и фильтром -->
+        <StackPanel Grid.Row="0" Style="{StaticResource ButtonPanelStyle}">
             <Button x:Name="btnAddVisit" Content="Новый приём" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddVisit_Click"/>
-            <Button x:Name="btnViewDetails" Content="Подробнее" Margin="10,0,0,0"
+            <Button x:Name="btnViewDetails" Content="Подробнее"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnViewDetails_Click"/>
-            <DatePicker x:Name="dpFilterDate" Width="120" Margin="10,0,0,0"
+            <TextBlock Text="Фильтр по дате:" Style="{StaticResource LabelTextBlockStyle}"/>
+            <DatePicker x:Name="dpFilterDate" 
+                        Style="{StaticResource DatePickerStyle}"
                         SelectedDateChanged="DpFilterDate_SelectedDateChanged"/>
-            <Button x:Name="btnClearFilter" Content="Сбросить" Margin="10,0,0,0"
+            <Button x:Name="btnClearFilter" Content="Сбросить"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnClearFilter_Click"/>
         </StackPanel>
 
+        <!-- Таблица приёмов -->
         <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Дата" Binding="{Binding VisitDate, StringFormat=\{0:dd.MM.yyyy HH:mm\}}" Width="120"/>
