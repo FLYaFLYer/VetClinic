@@ -15,7 +15,11 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Дата" Binding="{Binding VisitDate, StringFormat=dd.MM.yyyy HH:mm}" Width="120"/>
                 <DataGridTextColumn Header="Диагноз" Binding="{Binding Diagnosis}" Width="*"/>
-                <DataGridTextColumn Header="Ветеринар" Binding="{Binding User.FullName}" Width="150"/>
+                <DataGridTextColumn Header="Ветеринар" Width="150" IsReadOnly="True">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="User.FullName" Mode="OneWay"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Температура" Binding="{Binding Temperature, StringFormat=N1}" Width="80"/>
             </DataGrid.Columns>
         </DataGrid>

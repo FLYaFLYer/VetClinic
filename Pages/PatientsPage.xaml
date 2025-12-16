@@ -8,20 +8,21 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+        <!-- Используем UniformGrid для одинакового размера кнопок -->
+        <UniformGrid Grid.Row="0" Rows="1" Columns="4" Margin="10" HorizontalAlignment="Left">
             <Button x:Name="btnAddPatient" Content="Добавить" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddPatient_Click"/>
-            <Button x:Name="btnEditPatient" Content="Изменить" Margin="10,0,0,0"
+            <Button x:Name="btnEditPatient" Content="Изменить"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnEditPatient_Click"/>
-            <Button x:Name="btnDeletePatient" Content="Удалить" Margin="10,0,0,0"
+            <Button x:Name="btnDeletePatient" Content="Удалить"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnDeletePatient_Click"/>
-            <Button x:Name="btnViewHistory" Content="История" Margin="10,0,0,0"
+            <Button x:Name="btnViewHistory" Content="История"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnViewHistory_Click"/>
-        </StackPanel>
+        </UniformGrid>
 
         <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
             <DataGrid.Columns>
@@ -29,12 +30,12 @@
                 <DataGridTextColumn Header="Кличка" Binding="{Binding Name}" Width="100"/>
                 <DataGridTextColumn Header="Вид" Binding="{Binding AnimalType.Name}" Width="80"/>
                 <DataGridTextColumn Header="Порода" Binding="{Binding Breed.Name}" Width="100"/>
-                <DataGridTextColumn Header="Владелец" Width="150">
+                <DataGridTextColumn Header="Владелец" Width="150" IsReadOnly="True">
                     <DataGridTextColumn.Binding>
                         <Binding Path="Owner.FullName" Mode="OneWay"/>
                     </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Возраст" Binding="{Binding AgeFormatted}" Width="80"/>
+                <DataGridTextColumn Header="Возраст" Binding="{Binding AgeFormatted}" Width="80" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Вес" Binding="{Binding Weight, StringFormat=N2}" Width="60"/>
                 <DataGridTextColumn Header="Цвет" Binding="{Binding Color}" Width="80"/>
                 <DataGridTextColumn Header="Особые приметы" Binding="{Binding DistinctiveFeatures}" Width="*"/>

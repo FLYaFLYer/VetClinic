@@ -16,15 +16,17 @@
                            FontSize="18" 
                            FontWeight="Bold" 
                            Margin="0,0,0,20"
-                           Foreground="{StaticResource PrimaryGreenDarkBrush}"/>
+                           Foreground="#FF388E3C"/>
 
                 <!-- Логин -->
                 <TextBlock Text="Логин:" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtLogin" 
-                         Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" Padding="8,4"/>
+                         Text="{Binding Login, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" 
+                         Padding="8,4"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Пароль -->
                 <Grid>
@@ -44,11 +46,17 @@
                                 Margin="0,5,0,0">
                         <Button x:Name="btnGeneratePassword" 
                                 Content="Сгенерировать" 
-                                Margin="5,0,0,0" Padding="8,4" Height="28"
+                                Margin="5,0,0,0" 
+                                Padding="8,4" 
+                                Height="28"
+                                Style="{StaticResource NavButtonStyle}"
                                 Click="BtnGeneratePassword_Click"/>
                         <Button x:Name="btnCopyPassword" 
                                 Content="Копировать" 
-                                Margin="5,0,0,0" Padding="8,4" Height="28"
+                                Margin="5,0,0,0" 
+                                Padding="8,4" 
+                                Height="28"
+                                Style="{StaticResource NavButtonStyle}"
                                 Click="BtnCopyPassword_Click"/>
                     </StackPanel>
                 </Grid>
@@ -64,18 +72,21 @@
                                  Grid.Column="0"
                                  PasswordChanged="PwdPassword_PasswordChanged"
                                  Height="34"
-                                 Padding="8,4"/>
+                                 Padding="8,4"
+                                 Margin="0,0,5,0"/>
 
                     <!-- Текстовое поле для отображения пароля -->
                     <TextBox x:Name="txtPasswordVisible" 
                              Grid.Column="0"
                              Visibility="Collapsed"
-                             Height="34" Padding="8,4"/>
+                             Height="34" 
+                             Padding="8,4"
+                             Margin="0,0,5,0"/>
 
                     <CheckBox x:Name="chkShowPassword" 
                               Grid.Column="1" 
                               Content="Показать"
-                              Margin="10,0,0,0" 
+                              Margin="0,0,0,0" 
                               VerticalAlignment="Center"
                               Checked="ChkShowPassword_Checked"
                               Unchecked="ChkShowPassword_Unchecked"/>
@@ -86,49 +97,59 @@
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtLastName" 
-                         Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" Padding="8,4"/>
+                         Text="{Binding LastName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" 
+                         Padding="8,4"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Имя -->
                 <TextBlock Text="Имя:" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtFirstName" 
-                         Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" Padding="8,4"/>
+                         Text="{Binding FirstName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" 
+                         Padding="8,4"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Отчество -->
                 <TextBlock Text="Отчество:" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtMiddleName" 
-                         Text="{Binding MiddleName, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" Padding="8,4"/>
+                         Text="{Binding MiddleName}" 
+                         Height="34" 
+                         Padding="8,4"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Телефон -->
                 <TextBlock Text="Телефон (формат: +7 (XXX) XXX-XX-XX):" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtPhoneNumber" 
-                         Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" Padding="8,4"
-                         TextChanged="TxtPhoneNumber_TextChanged"/>
+                         Text="{Binding PhoneNumber, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="34" 
+                         Padding="8,4"
+                         TextChanged="TxtPhoneNumber_TextChanged"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Дата рождения -->
                 <TextBlock Text="Дата рождения:" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <DatePicker x:Name="dpDateOfBirth" 
-                            SelectedDate="{Binding DateOfBirth}" 
-                            Height="34"/>
+                            SelectedDate="{Binding DateOfBirth, ValidatesOnDataErrors=True}" 
+                            Height="34"
+                            Style="{StaticResource BaseDatePickerStyle}"/>
 
                 <!-- Дата приема -->
                 <TextBlock Text="Дата приема:" 
                            FontWeight="SemiBold" 
                            Margin="0,10,0,5"/>
                 <DatePicker x:Name="dpDateOfHire" 
-                            SelectedDate="{Binding DateOfHire}" 
-                            Height="34"/>
+                            SelectedDate="{Binding DateOfHire, ValidatesOnDataErrors=True}" 
+                            Height="34"
+                            Style="{StaticResource BaseDatePickerStyle}"/>
 
                 <!-- Роль -->
                 <TextBlock Text="Роль:" 
@@ -137,8 +158,10 @@
                 <ComboBox x:Name="cmbRoles" 
                           DisplayMemberPath="Name" 
                           SelectedValuePath="Id" 
-                          SelectedValue="{Binding RoleId}" 
-                          Height="34" Padding="8,4"/>
+                          SelectedValue="{Binding RoleId, ValidatesOnDataErrors=True}" 
+                          Height="34" 
+                          Padding="8,4"
+                          Style="{StaticResource BaseComboBoxStyle}"/>
 
                 <!-- Кнопки -->
                 <Border BorderBrush="#FFEEEEEE" BorderThickness="0,1,0,0" Margin="0,30,0,0">

@@ -8,30 +8,37 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Панель с кнопками и фильтром -->
-        <StackPanel Grid.Row="0" Style="{StaticResource ButtonPanelStyle}">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <Button x:Name="btnAddVisit" Content="Новый приём" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddVisit_Click"/>
             <Button x:Name="btnViewDetails" Content="Подробнее"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnViewDetails_Click"/>
-            <TextBlock Text="Фильтр по дате:" Style="{StaticResource LabelTextBlockStyle}"/>
+            <TextBlock Text="Фильтр по дате:" VerticalAlignment="Center" Margin="10,0,5,0" FontWeight="SemiBold" FontSize="14"/>
             <DatePicker x:Name="dpFilterDate" 
-                        Style="{StaticResource DatePickerStyle}"
+                        Width="140" Height="32" VerticalAlignment="Center" Margin="10,0,0,0"
                         SelectedDateChanged="DpFilterDate_SelectedDateChanged"/>
             <Button x:Name="btnClearFilter" Content="Сбросить"
                     Style="{StaticResource NavButtonStyle}"
+                    Margin="10,0,0,0"
                     Click="BtnClearFilter_Click"/>
         </StackPanel>
 
-        <!-- Таблица приёмов -->
         <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Дата" Binding="{Binding VisitDate, StringFormat=\{0:dd.MM.yyyy HH:mm\}}" Width="120"/>
+                <DataGridTextColumn Header="Дата" Binding="{Binding VisitDate, StringFormat=dd.MM.yyyy HH:mm}" Width="120"/>
                 <DataGridTextColumn Header="Пациент" Binding="{Binding Patient.Name}" Width="120"/>
-                <DataGridTextColumn Header="Владелец" Binding="{Binding Patient.Owner.FullName}" Width="150"/>
-                <DataGridTextColumn Header="Ветеринар" Binding="{Binding User.FullName}" Width="150"/>
+                <DataGridTextColumn Header="Владелец" Width="150" IsReadOnly="True">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Patient.Owner.FullName" Mode="OneWay"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Ветеринар" Width="150" IsReadOnly="True">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="User.FullName" Mode="OneWay"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Диагноз" Binding="{Binding Diagnosis}" Width="200"/>
                 <DataGridTextColumn Header="Температура" Binding="{Binding Temperature}" Width="80"/>
                 <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="80"/>

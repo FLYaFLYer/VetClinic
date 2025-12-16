@@ -1,11 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VetClinic.Models
 {
     [Table("visits")]
-    public class Visit
+    public class Visit : IDataErrorInfo
     {
         [Key]
         [Column("id")]
@@ -13,6 +14,7 @@ namespace VetClinic.Models
 
         [ForeignKey("Patient")]
         [Column("patient_id")]
+        [Range(1, int.MaxValue, ErrorMessage = "Выберите пациента")]
         public int PatientId { get; set; }
 
         [ForeignKey("User")]
@@ -22,8 +24,8 @@ namespace VetClinic.Models
         [Column("visit_date")]
         public DateTime VisitDate { get; set; }
 
-        [Required]
-        [StringLength(500)]
+        [Required(ErrorMessage = "Диагноз обязателен")]
+        [StringLength(500, ErrorMessage = "Диагноз не должен превышать 500 символов")]
         [Column("diagnosis")]
         public string Diagnosis { get; set; }
 
@@ -32,9 +34,11 @@ namespace VetClinic.Models
         public string Symptoms { get; set; }
 
         [Column("temperature")]
+        [Range(30.0, 45.0, ErrorMessage = "Температура должна быть между 30 и 45 градусами")]
         public decimal? Temperature { get; set; }
 
         [Column("weight")]
+        [Range(0.01, 1000.0, ErrorMessage = "Вес должен быть положительным числом (0.01 - 1000)")]
         public decimal? Weight { get; set; }
 
         [Column("recommendations")]
@@ -60,5 +64,41 @@ namespace VetClinic.Models
         [NotMapped]
         public string NextVisitFormatted => NextVisitDate.HasValue ?
             NextVisitDate.Value.ToString("dd.MM.yyyy") : "Не назначен";
+
+        // Реализация IDataErrorInfo
+        public string Error => null;
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = null;
+
+                switch (columnName)
+                {
+                    case nameof(PatientId):
+                        if (PatientId <= 0)
+                            error = "Выберите пациента";
+                        break;
+
+                    case nameof(Diagnosis):
+                        if (string.IsNullOrWhiteSpace(Diagnosis))
+                            error = "Введите диагноз";
+                        break;
+
+                    case nameof(Temperature):
+                        if (Temperature.HasValue && (Temperature < 30 || Temperature > 45))
+                            error = "Температура должна быть между 30 и 45 градусами";
+                        break;
+
+                    case nameof(Weight):
+                        if (Weight.HasValue && Weight <= 0)
+                            error = "Вес должен быть положительным числом";
+                        break;
+                }
+
+                return error;
+            }
+        }
     }
 }

@@ -8,25 +8,23 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Панель с кнопками и поиском -->
-        <StackPanel Grid.Row="0" Style="{StaticResource ButtonPanelStyle}">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <Button x:Name="btnAddOwner" Content="Добавить" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddOwner_Click"/>
-            <Button x:Name="btnEditOwner" Content="Изменить"
+            <Button x:Name="btnEditOwner" Content="Изменить" Margin="10,0,0,0"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnEditOwner_Click"/>
-            <Button x:Name="btnDeleteOwner" Content="Удалить"
+            <Button x:Name="btnDeleteOwner" Content="Удалить" Margin="10,0,0,0"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnDeleteOwner_Click"/>
-            <TextBlock Text="Поиск:" Style="{StaticResource LabelTextBlockStyle}"/>
+            <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="10,0,5,0" FontWeight="SemiBold" FontSize="14"/>
             <TextBox x:Name="txtSearch" 
-                     Style="{StaticResource SearchTextBoxStyle}"
+                     Width="220" Height="32" VerticalAlignment="Center" Margin="10,0,0,0"
                      ToolTip="Введите фамилию, имя, телефон или email для поиска"
                      TextChanged="TxtSearch_TextChanged"/>
         </StackPanel>
 
-        <!-- Таблица владельцев -->
         <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>

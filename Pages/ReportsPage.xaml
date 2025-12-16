@@ -23,11 +23,13 @@
                 <Button Content="Сформировать" 
                         Margin="10,0,0,0" 
                         Padding="10,5"
+                        Style="{StaticResource NavButtonStyle}"
                         Click="BtnGenerate_Click"/>
 
                 <Button Content="Экспорт в Excel" 
                         Margin="10,0,0,0" 
                         Padding="10,5"
+                        Style="{StaticResource NavButtonStyle}"
                         Click="BtnExport_Click"/>
             </StackPanel>
         </StackPanel>

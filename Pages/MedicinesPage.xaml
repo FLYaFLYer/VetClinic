@@ -8,23 +8,24 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+        <!-- Используем UniformGrid для одинакового размера кнопок -->
+        <UniformGrid Grid.Row="0" Rows="1" Columns="5" Margin="10" HorizontalAlignment="Left">
             <Button x:Name="btnAddMedicine" Content="Добавить" 
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddMedicine_Click"/>
-            <Button x:Name="btnEditMedicine" Content="Изменить" Margin="10,0,0,0"
+            <Button x:Name="btnEditMedicine" Content="Изменить"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnEditMedicine_Click"/>
-            <Button x:Name="btnDeleteMedicine" Content="Удалить" Margin="10,0,0,0"
+            <Button x:Name="btnDeleteMedicine" Content="Удалить"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnDeleteMedicine_Click"/>
-            <Button x:Name="btnAddStock" Content="Приход" Margin="10,0,0,0"
+            <Button x:Name="btnAddStock" Content="Приход"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnAddStock_Click"/>
-            <Button x:Name="btnRemoveStock" Content="Расход" Margin="10,0,0,0"
+            <Button x:Name="btnRemoveStock" Content="Расход"
                     Style="{StaticResource NavButtonStyle}"
                     Click="BtnRemoveStock_Click"/>
-        </StackPanel>
+        </UniformGrid>
 
         <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False">
             <DataGrid.Columns>
@@ -35,29 +36,18 @@
                 <DataGridTextColumn Header="Единица" Binding="{Binding Unit}" Width="70"/>
                 <DataGridTextColumn Header="Остаток" Binding="{Binding TotalQuantity}" Width="70"/>
                 <DataGridTextColumn Header="Мин.запас" Binding="{Binding MinStock}" Width="80"/>
-                <DataGridTextColumn Header="Статус" Width="100">
+                <DataGridTextColumn Header="Статус" Width="100" IsReadOnly="True">
                     <DataGridTextColumn.Binding>
-                        <MultiBinding StringFormat="{}{0}">
-                            <Binding Path="IsLowStock"/>
-                        </MultiBinding>
+                        <Binding Path="StockStatus" Mode="OneWay"/>
                     </DataGridTextColumn.Binding>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Text">
-                                <Setter.Value>
-                                    <MultiBinding StringFormat="{}{0}">
-                                        <Binding Path="IsLowStock"/>
-                                    </MultiBinding>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Foreground" Value="Red" />
+                            <Setter Property="Foreground" Value="Red"/>
+                            <Setter Property="Text" Value="Мало!"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLowStock}" Value="False">
-                                    <Setter Property="Foreground" Value="Green" />
-                                    <Setter Property="Text" Value="В норме" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsLowStock}" Value="True">
-                                    <Setter Property="Text" Value="Мало!" />
+                                    <Setter Property="Foreground" Value="Green"/>
+                                    <Setter Property="Text" Value="В норме"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

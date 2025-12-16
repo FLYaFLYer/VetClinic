@@ -172,58 +172,23 @@ namespace VetClinic.Dialogs
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Проверка логина
-            if (string.IsNullOrWhiteSpace(Login))
-            {
-                MessageBox.Show("Введите логин пользователя", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                txtLogin.Focus();
-                return;
-            }
+            // Принудительно обновляем привязки для срабатывания валидации
+            txtLogin.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtLastName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtFirstName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtPhoneNumber.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
 
-            // Проверка фамилии
-            if (string.IsNullOrWhiteSpace(LastName))
+            // Проверка на ошибки валидации
+            if (Validation.GetHasError(txtLogin) ||
+                Validation.GetHasError(txtLastName) ||
+                Validation.GetHasError(txtFirstName) ||
+                Validation.GetHasError(txtPhoneNumber) ||
+                DateOfBirth == null ||
+                DateOfHire == null ||
+                RoleId == null || RoleId <= 0)
             {
-                MessageBox.Show("Введите фамилию пользователя", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                txtLastName.Focus();
-                return;
-            }
-
-            // Проверка имени
-            if (string.IsNullOrWhiteSpace(FirstName))
-            {
-                MessageBox.Show("Введите имя пользователя", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                txtFirstName.Focus();
-                return;
-            }
-
-            // Проверка телефона
-            if (string.IsNullOrWhiteSpace(PhoneNumber))
-            {
-                MessageBox.Show("Введите телефон пользователя", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                txtPhoneNumber.Focus();
-                return;
-            }
-
-            // Проверка формата телефона
-            string phoneDigits = Regex.Replace(PhoneNumber, @"[^\d]", "");
-            if (phoneDigits.Length != 11 && phoneDigits.Length != 10)
-            {
-                MessageBox.Show("Введите корректный номер телефона (10 или 11 цифр)", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                txtPhoneNumber.Focus();
-                return;
-            }
-
-            // Проверка роли
-            if (cmbRoles.SelectedItem == null)
-            {
-                MessageBox.Show("Выберите роль пользователя", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                cmbRoles.Focus();
+                MessageBox.Show("Исправьте ошибки в форме перед сохранением",
+                              "Ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -236,58 +201,53 @@ namespace VetClinic.Dialogs
                 return;
             }
 
-            // Проверка дат
-            if (!DateOfBirth.HasValue || !DateOfHire.HasValue)
+            try
             {
-                MessageBox.Show("Заполните все даты", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                // Обновляем EditedUser из полей ввода
+                EditedUser.Login = Login;
+                EditedUser.LastName = LastName;
+                EditedUser.FirstName = FirstName;
+                EditedUser.MiddleName = MiddleName;
+                EditedUser.PhoneNumber = FormatPhoneNumber(PhoneNumber);
+                EditedUser.DateOfBirth = DateOfBirth.Value;
+                EditedUser.DateOfHire = DateOfHire.Value;
+                EditedUser.RoleId = RoleId.Value;
 
-            // Обновляем EditedUser из полей ввода
-            EditedUser.Login = Login;
-            EditedUser.LastName = LastName;
-            EditedUser.FirstName = FirstName;
-            EditedUser.MiddleName = MiddleName;
-            EditedUser.PhoneNumber = FormatPhoneNumber(PhoneNumber);
-            EditedUser.DateOfBirth = DateOfBirth.Value;
-            EditedUser.DateOfHire = DateOfHire.Value;
-            EditedUser.RoleId = RoleId ?? 2;
-
-            // Проверяем, был ли изменен пароль
-            if (EditedUser.Id == 0 || !string.IsNullOrEmpty(PasswordPlainText))
-            {
-                // Пароль уже установлен в обработчиках PasswordChanged
-            }
-            else if (EditedUser.Id > 0)
-            {
-                // Для существующего пользователя, если пароль не менялся, сохраняем старый
-                var existingUser = _context.Users.AsNoTracking().FirstOrDefault(u => u.Id == EditedUser.Id);
-                if (existingUser != null)
+                if (EditedUser.Id == 0)
                 {
-                    EditedUser.Password = existingUser.Password;
+                    _context.Users.Add(EditedUser);
                 }
-            }
-
-            // Валидация модели
-            var validationResults = new System.Collections.Generic.List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(EditedUser);
-            bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(EditedUser, validationContext, validationResults, true);
-
-            if (!isValid)
-            {
-                string errorMessage = "Ошибки валидации:\n";
-                foreach (var validationResult in validationResults)
+                else
                 {
-                    errorMessage += $"- {validationResult.ErrorMessage}\n";
-                }
-                MessageBox.Show(errorMessage, "Ошибка валидации",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                    var existingUser = _context.Users.Find(EditedUser.Id);
+                    if (existingUser != null)
+                    {
+                        existingUser.LastName = EditedUser.LastName;
+                        existingUser.FirstName = EditedUser.FirstName;
+                        existingUser.MiddleName = EditedUser.MiddleName;
+                        existingUser.PhoneNumber = EditedUser.PhoneNumber;
+                        existingUser.DateOfBirth = EditedUser.DateOfBirth;
+                        existingUser.DateOfHire = EditedUser.DateOfHire;
+                        existingUser.RoleId = EditedUser.RoleId;
 
-            DialogResult = true;
-            Close();
+                        // Обновляем пароль только если он был изменен
+                        if (!string.IsNullOrEmpty(PasswordPlainText))
+                        {
+                            existingUser.Password = EditedUser.Password;
+                        }
+                    }
+                }
+
+                _context.SaveChanges();
+
+                DialogResult = true;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

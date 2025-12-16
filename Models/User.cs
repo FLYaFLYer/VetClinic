@@ -3,11 +3,12 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace VetClinic.Models
 {
     [Table("users")]
-    public class User : INotifyPropertyChanged
+    public class User : INotifyPropertyChanged, System.ComponentModel.IDataErrorInfo
     {
         private string _login;
         private string _lastName;
@@ -163,6 +164,73 @@ namespace VetClinic.Models
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // Реализация IDataErrorInfo для валидации
+        public string Error => null;
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = null;
+
+                switch (columnName)
+                {
+                    case nameof(Login):
+                        if (string.IsNullOrWhiteSpace(Login))
+                            error = "Логин обязателен";
+                        else if (Login.Length > 50)
+                            error = "Логин не должен превышать 50 символов";
+                        break;
+
+                    case nameof(LastName):
+                        if (string.IsNullOrWhiteSpace(LastName))
+                            error = "Фамилия обязательна";
+                        else if (LastName.Length > 50)
+                            error = "Фамилия не должна превышать 50 символов";
+                        break;
+
+                    case nameof(FirstName):
+                        if (string.IsNullOrWhiteSpace(FirstName))
+                            error = "Имя обязательно";
+                        else if (FirstName.Length > 50)
+                            error = "Имя не должно превышать 50 символов";
+                        break;
+
+                    case nameof(PhoneNumber):
+                        if (string.IsNullOrWhiteSpace(PhoneNumber))
+                            error = "Телефон обязателен";
+                        else
+                        {
+                            string digits = Regex.Replace(PhoneNumber, @"[^\d]", "");
+                            if (digits.Length < 10 || digits.Length > 11)
+                                error = "Введите корректный номер телефона (10 или 11 цифр)";
+                        }
+                        break;
+
+                    case nameof(DateOfBirth):
+                        if (DateOfBirth > DateTime.Now)
+                            error = "Дата рождения не может быть в будущем";
+                        else if (DateOfBirth < DateTime.Now.AddYears(-100))
+                            error = "Некорректная дата рождения";
+                        break;
+
+                    case nameof(DateOfHire):
+                        if (DateOfHire > DateTime.Now)
+                            error = "Дата приема не может быть в будущем";
+                        else if (DateOfHire < DateOfBirth)
+                            error = "Дата приема не может быть раньше даты рождения";
+                        break;
+
+                    case nameof(RoleId):
+                        if (RoleId <= 0)
+                            error = "Выберите роль пользователя";
+                        break;
+                }
+
+                return error;
+            }
         }
     }
 }
