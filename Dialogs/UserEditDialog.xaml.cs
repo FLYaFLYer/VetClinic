@@ -2,6 +2,7 @@
 using VetClinic.Models;
 using VetClinic.Utils;
 using System;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,14 +11,13 @@ using System.Windows.Controls;
 
 namespace VetClinic.Dialogs
 {
-    public partial class UserEditDialog : Window
+    public partial class UserEditDialog : Window, IDataErrorInfo
     {
         private readonly VeterContext _context = new VeterContext();
 
         public User EditedUser { get; private set; }
         public string PasswordPlainText { get; set; }
 
-        // Свойства для привязки
         public string Login { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
@@ -31,13 +31,11 @@ namespace VetClinic.Dialogs
         {
             InitializeComponent();
 
-            // Загружаем роли
             _context.Roles.Load();
             cmbRoles.ItemsSource = _context.Roles.Local;
 
             if (user != null)
             {
-                // Редактирование существующего пользователя
                 EditedUser = user;
                 Login = user.Login;
                 LastName = user.LastName;
@@ -48,17 +46,16 @@ namespace VetClinic.Dialogs
                 DateOfHire = user.DateOfHire;
                 RoleId = user.RoleId;
 
-                txtLogin.IsEnabled = false; // Не позволяем менять логин при редактировании
-                PasswordPlainText = ""; // Пустой пароль, нужно ввести новый
+                txtLogin.IsEnabled = false;
+                PasswordPlainText = "";
             }
             else
             {
-                // Создание нового пользователя
                 EditedUser = new User
                 {
                     DateOfBirth = DateTime.Now.AddYears(-20),
                     DateOfHire = DateTime.Now,
-                    RoleId = 2 // По умолчанию Администратор
+                    RoleId = 2
                 };
 
                 Login = "";
@@ -69,21 +66,16 @@ namespace VetClinic.Dialogs
                 DateOfBirth = EditedUser.DateOfBirth;
                 DateOfHire = EditedUser.DateOfHire;
                 RoleId = EditedUser.RoleId;
-
-                // Не генерируем пароль автоматически!
             }
 
-            // Устанавливаем DataContext
             DataContext = this;
         }
 
-        // Метод для форматирования номера телефона
         private string FormatPhoneNumber(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
                 return phone;
 
-            // Удаляем все нецифровые символы
             string digits = Regex.Replace(phone, @"[^\d]", "");
 
             if (digits.Length == 11 && digits.StartsWith("7"))
@@ -99,11 +91,9 @@ namespace VetClinic.Dialogs
                 return $"+7 ({digits.Substring(1, 3)}) {digits.Substring(4, 3)}-{digits.Substring(7, 2)}-{digits.Substring(9, 2)}";
             }
 
-            // Если номер не соответствует формату, возвращаем как есть
             return phone;
         }
 
-        // Обработчик для форматирования телефона при вводе
         private void TxtPhoneNumber_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (txtPhoneNumber.IsFocused)
@@ -111,15 +101,90 @@ namespace VetClinic.Dialogs
                 string text = txtPhoneNumber.Text;
                 int caretIndex = txtPhoneNumber.CaretIndex;
 
-                // Форматируем текст
                 string formatted = FormatPhoneNumber(text);
 
                 if (formatted != text)
                 {
                     txtPhoneNumber.Text = formatted;
-                    // Пытаемся сохранить позицию курсора
                     txtPhoneNumber.CaretIndex = caretIndex + (formatted.Length - text.Length);
                 }
+            }
+        }
+
+        public string Error => null;
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = null;
+
+                switch (columnName)
+                {
+                    case nameof(Login):
+                        if (string.IsNullOrWhiteSpace(Login))
+                            error = "Логин обязателен";
+                        else if (Login.Length > 50)
+                            error = "Логин не должен превышать 50 символов";
+                        else if (!Regex.IsMatch(Login, @"^[a-zA-Z0-9_]+$"))
+                            error = "Логин может содержать только буквы, цифры и подчеркивания";
+                        break;
+
+                    case nameof(LastName):
+                        if (string.IsNullOrWhiteSpace(LastName))
+                            error = "Фамилия обязательна";
+                        else if (LastName.Length > 50)
+                            error = "Фамилия не должна превышать 50 символов";
+                        break;
+
+                    case nameof(FirstName):
+                        if (string.IsNullOrWhiteSpace(FirstName))
+                            error = "Имя обязательно";
+                        else if (FirstName.Length > 50)
+                            error = "Имя не должно превышать 50 символов";
+                        break;
+
+                    case nameof(MiddleName):
+                        if (!string.IsNullOrWhiteSpace(MiddleName) && MiddleName.Length > 50)
+                            error = "Отчество не должно превышать 50 символов";
+                        break;
+
+                    case nameof(PhoneNumber):
+                        if (string.IsNullOrWhiteSpace(PhoneNumber))
+                            error = "Телефон обязателен";
+                        else
+                        {
+                            string digits = Regex.Replace(PhoneNumber, @"[^\d]", "");
+                            if (digits.Length < 10 || digits.Length > 15)
+                                error = "Введите корректный номер телефона (10-15 цифр)";
+                        }
+                        break;
+
+                    case nameof(DateOfBirth):
+                        if (!DateOfBirth.HasValue)
+                            error = "Дата рождения обязательна";
+                        else if (DateOfBirth > DateTime.Now)
+                            error = "Дата рождения не может быть в будущем";
+                        else if (DateOfBirth < DateTime.Now.AddYears(-100))
+                            error = "Некорректная дата рождения";
+                        break;
+
+                    case nameof(DateOfHire):
+                        if (!DateOfHire.HasValue)
+                            error = "Дата приема обязательна";
+                        else if (DateOfHire > DateTime.Now)
+                            error = "Дата приема не может быть в будущем";
+                        else if (DateOfBirth.HasValue && DateOfHire < DateOfBirth)
+                            error = "Дата приема не может быть раньше даты рождения";
+                        break;
+
+                    case nameof(RoleId):
+                        if (!RoleId.HasValue || RoleId <= 0)
+                            error = "Выберите роль пользователя";
+                        break;
+                }
+
+                return error;
             }
         }
 
@@ -129,11 +194,9 @@ namespace VetClinic.Dialogs
             PasswordPlainText = randomPassword;
             EditedUser.Password = SecurityHelper.HashPassword(randomPassword);
 
-            // Обновляем отображение пароля
             pwdPassword.Password = PasswordPlainText;
             txtPasswordVisible.Text = PasswordPlainText;
 
-            // Показываем пароль пользователю
             MessageBox.Show($"Пароль пользователя: {randomPassword}\n\nСкопируйте его для передачи пользователю!",
                           "Пароль сгенерирован", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -172,27 +235,29 @@ namespace VetClinic.Dialogs
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Принудительно обновляем привязки для срабатывания валидации
+            // Принудительно обновляем привязки
             txtLogin.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtLastName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtFirstName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtPhoneNumber.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            dpDateOfBirth.GetBindingExpression(DatePicker.SelectedDateProperty)?.UpdateSource();
+            dpDateOfHire.GetBindingExpression(DatePicker.SelectedDateProperty)?.UpdateSource();
+            cmbRoles.GetBindingExpression(ComboBox.SelectedValueProperty)?.UpdateSource();
 
-            // Проверка на ошибки валидации
+            // Проверяем ошибки валидации
             if (Validation.GetHasError(txtLogin) ||
                 Validation.GetHasError(txtLastName) ||
                 Validation.GetHasError(txtFirstName) ||
                 Validation.GetHasError(txtPhoneNumber) ||
-                DateOfBirth == null ||
-                DateOfHire == null ||
-                RoleId == null || RoleId <= 0)
+                Validation.GetHasError(dpDateOfBirth) ||
+                Validation.GetHasError(dpDateOfHire) ||
+                Validation.GetHasError(cmbRoles))
             {
                 MessageBox.Show("Исправьте ошибки в форме перед сохранением",
                               "Ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Проверка пароля для нового пользователя
             if (EditedUser.Id == 0 && string.IsNullOrEmpty(PasswordPlainText))
             {
                 MessageBox.Show("Введите пароль или сгенерируйте его", "Ошибка",
@@ -203,7 +268,6 @@ namespace VetClinic.Dialogs
 
             try
             {
-                // Обновляем EditedUser из полей ввода
                 EditedUser.Login = Login;
                 EditedUser.LastName = LastName;
                 EditedUser.FirstName = FirstName;
@@ -230,7 +294,6 @@ namespace VetClinic.Dialogs
                         existingUser.DateOfHire = EditedUser.DateOfHire;
                         existingUser.RoleId = EditedUser.RoleId;
 
-                        // Обновляем пароль только если он был изменен
                         if (!string.IsNullOrEmpty(PasswordPlainText))
                         {
                             existingUser.Password = EditedUser.Password;

@@ -37,9 +37,6 @@ namespace VetClinic.Models
         [Range(30.0, 45.0, ErrorMessage = "Температура должна быть между 30 и 45 градусами")]
         public decimal? Temperature { get; set; }
 
-        [Column("weight")]
-        [Range(0.01, 1000.0, ErrorMessage = "Вес должен быть положительным числом (0.01 - 1000)")]
-        public decimal? Weight { get; set; }
 
         [Column("recommendations")]
         [StringLength(1000)]
@@ -49,8 +46,8 @@ namespace VetClinic.Models
         public DateTime? NextVisitDate { get; set; }
 
         [Column("status")]
-        [StringLength(20)]
-        public string Status { get; set; } = "Завершён";
+        [StringLength(50, ErrorMessage = "Статус не должен превышать 50 символов")]
+        public string Status { get; set; } = "Запланирован";
 
         public virtual Patient Patient { get; set; }
         public virtual User User { get; set; }
@@ -58,12 +55,27 @@ namespace VetClinic.Models
         [NotMapped]
         public string TemperatureFormatted => Temperature.HasValue ? $"{Temperature.Value:N1}°C" : "Не измерялась";
 
+        // Оставляем для обратной совместимости, но возвращаем вес пациента
         [NotMapped]
-        public string WeightFormatted => Weight.HasValue ? $"{Weight.Value:N2} кг" : "Не взвешивался";
+        public string WeightFormatted
+        {
+            get
+            {
+                if (Patient != null && Patient.Weight.HasValue)
+                    return $"{Patient.Weight.Value:N2} кг";
+                return "Не взвешивался";
+            }
+        }
 
         [NotMapped]
         public string NextVisitFormatted => NextVisitDate.HasValue ?
             NextVisitDate.Value.ToString("dd.MM.yyyy") : "Не назначен";
+
+        [NotMapped]
+        public bool IsCompleted => Status == "Завершён";
+
+        [NotMapped]
+        public bool CanBeCancelled => Status == "Запланирован" || Status == "В процессе";
 
         // Реализация IDataErrorInfo
         public string Error => null;
@@ -84,6 +96,8 @@ namespace VetClinic.Models
                     case nameof(Diagnosis):
                         if (string.IsNullOrWhiteSpace(Diagnosis))
                             error = "Введите диагноз";
+                        else if (Diagnosis.Length > 500)
+                            error = "Диагноз не должен превышать 500 символов";
                         break;
 
                     case nameof(Temperature):
@@ -91,9 +105,11 @@ namespace VetClinic.Models
                             error = "Температура должна быть между 30 и 45 градусами";
                         break;
 
-                    case nameof(Weight):
-                        if (Weight.HasValue && Weight <= 0)
-                            error = "Вес должен быть положительным числом";
+                    case nameof(Status):
+                        if (string.IsNullOrWhiteSpace(Status))
+                            error = "Выберите статус";
+                        else if (Status.Length > 50)
+                            error = "Статус не должен превышать 50 символов";
                         break;
                 }
 

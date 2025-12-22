@@ -7,31 +7,37 @@
         <Color x:Key="PrimaryGreenColor">#FF4CAF50</Color>
         <Color x:Key="PrimaryGreenDarkColor">#FF388E3C</Color>
         <Color x:Key="ErrorColor">#FFD32F2F</Color>
+        <Color x:Key="BorderColor">#FFDDDDDD</Color>
+        <Color x:Key="BackgroundColor">#FFF9F9F9</Color>
+        <Color x:Key="ErrorBorderColor">#FFD32F2F</Color>
+        <Color x:Key="WarningColor">#FFF57C00</Color>
+        <Color x:Key="InfoColor">#FF1976D2</Color>
 
         <!-- Кисти -->
         <SolidColorBrush x:Key="PrimaryGreenBrush" Color="{StaticResource PrimaryGreenColor}"/>
         <SolidColorBrush x:Key="PrimaryGreenDarkBrush" Color="{StaticResource PrimaryGreenDarkColor}"/>
         <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+        <SolidColorBrush x:Key="ErrorBorderBrush" Color="{StaticResource ErrorBorderColor}"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+        <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
 
-        <!-- Шаблон для ошибок валидации -->
+        <!-- ИСПРАВЛЕННЫЙ ШАБЛОН ДЛЯ ОШИБОК ВАЛИДАЦИИ -->
         <ControlTemplate x:Key="ValidationErrorTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <AdornedElementPlaceholder x:Name="adornerPlaceholder" Grid.Column="0"/>
-
+            <DockPanel LastChildFill="True">
                 <Border 
-                    Grid.Column="1"
-                    Background="Red" 
+                    Background="Red"
                     CornerRadius="10"
                     Width="20"
                     Height="20"
                     Margin="5,0,0,0"
+                    DockPanel.Dock="Right"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    ToolTipService.InitialShowDelay="0"
+                    ToolTipService.ShowDuration="60000">
+
                     <TextBlock 
                         Text="!"
                         Foreground="White"
@@ -39,23 +45,148 @@
                         FontSize="12"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
+
                         <TextBlock.ToolTip>
                             <ToolTip 
-                                Background="#FFD32F2F"
+                                Background="Red"
                                 Foreground="White"
-                                Padding="8"
+                                Padding="8,6"
                                 Placement="Right"
-                                HasDropShadow="True">
-                                <TextBlock Text="{Binding Path=AdornedElement.(Validation.Errors)[0].ErrorContent, 
-                                    RelativeSource={RelativeSource AncestorType=Adorner}}"/>
+                                HorizontalOffset="5"
+                                HasDropShadow="True"
+                                BorderBrush="DarkRed"
+                                BorderThickness="1">
+
+                                <TextBlock 
+                                    Text="{Binding Path=AdornedElement.(Validation.Errors)[0].ErrorContent, 
+                                           RelativeSource={RelativeSource TemplatedParent}}"
+                                    TextWrapping="Wrap"
+                                    MaxWidth="300"
+                                    FontSize="12"/>
                             </ToolTip>
                         </TextBlock.ToolTip>
                     </TextBlock>
                 </Border>
-            </Grid>
+                <AdornedElementPlaceholder/>
+            </DockPanel>
         </ControlTemplate>
 
-        <!-- Стиль для кнопок навигации - ФИКСИРОВАННЫЙ РАЗМЕР -->
+        <!-- УЛУЧШЕННЫЕ СТИЛИ ДЛЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ -->
+        <!-- Базовый стиль для TextBox с валидацией -->
+        <Style TargetType="TextBox" x:Key="ValidatableTextBoxStyle">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="BorderBrush" Value="{StaticResource ErrorBorderBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip 
+                                Background="{StaticResource ErrorBrush}"
+                                Foreground="White"
+                                Padding="8,6"
+                                Placement="Right"
+                                HorizontalOffset="5"
+                                HasDropShadow="True">
+                                <TextBlock 
+                                    Text="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"
+                                    TextWrapping="Wrap"
+                                    MaxWidth="300"/>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Базовый стиль для TextBox без валидации -->
+        <Style TargetType="TextBox" x:Key="BaseTextBoxStyle" BasedOn="{StaticResource ValidatableTextBoxStyle}">
+            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        </Style>
+
+        <!-- Базовый стиль для DatePicker с валидацией -->
+        <Style TargetType="DatePicker" x:Key="ValidatableDatePickerStyle">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="BorderBrush" Value="{StaticResource ErrorBorderBrush}"/>
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip 
+                                Background="{StaticResource ErrorBrush}"
+                                Foreground="White"
+                                Padding="8,6"
+                                Placement="Right"
+                                HorizontalOffset="5"
+                                HasDropShadow="True">
+                                <TextBlock 
+                                    Text="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"
+                                    TextWrapping="Wrap"
+                                    MaxWidth="300"/>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Базовый стиль для DatePicker без валидации -->
+        <Style TargetType="DatePicker" x:Key="BaseDatePickerStyle" BasedOn="{StaticResource ValidatableDatePickerStyle}">
+            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        </Style>
+
+        <!-- Базовый стиль для ComboBox с валидацией -->
+        <Style TargetType="ComboBox" x:Key="ValidatableComboBoxStyle">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="BorderBrush" Value="{StaticResource ErrorBorderBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip 
+                                Background="{StaticResource ErrorBrush}"
+                                Foreground="White"
+                                Padding="8,6"
+                                Placement="Right"
+                                HorizontalOffset="5"
+                                HasDropShadow="True">
+                                <TextBlock 
+                                    Text="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"
+                                    TextWrapping="Wrap"
+                                    MaxWidth="300"/>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Базовый стиль для ComboBox без валидации -->
+        <Style TargetType="ComboBox" x:Key="BaseComboBoxStyle" BasedOn="{StaticResource ValidatableComboBoxStyle}">
+            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        </Style>
+
+        <!-- Стиль для кнопок навигации -->
         <Style TargetType="Button" x:Key="NavButtonStyle">
             <Setter Property="Background" Value="#FF4CAF50"/>
             <Setter Property="Foreground" Value="White"/>
@@ -82,7 +213,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Стиль для кнопок в диалогах с отступом -->
+        <!-- Стиль для кнопок в диалогах -->
         <Style TargetType="Button" x:Key="DialogButtonStyle">
             <Setter Property="Background" Value="#FF4CAF50"/>
             <Setter Property="Foreground" Value="White"/>

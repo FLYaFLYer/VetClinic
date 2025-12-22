@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -87,21 +88,74 @@ namespace VetClinic.Pages
             }
 
             var patient = dataGrid.SelectedItem as Patient;
-            var dialog = new PatientEditDialog(patient);
-            if (dialog.ShowDialog() == true)
-            {
-                patient.Name = dialog.PatientName;
-                patient.OwnerId = dialog.OwnerId;
-                patient.AnimalTypeId = dialog.AnimalTypeId;
-                patient.BreedId = dialog.BreedId;
-                patient.BirthDate = dialog.BirthDate;
-                patient.Weight = dialog.Weight;
-                patient.Color = dialog.Color;
-                patient.DistinctiveFeatures = dialog.DistinctiveFeatures;
-                patient.ChipNumber = dialog.ChipNumber;
 
-                _context.SaveChanges();
-                LoadData();
+            // Создаем новый контекст для редактирования
+            using (var editContext = new VeterContext())
+            {
+                // Загружаем пациента с связанными данными
+                var patientToEdit = editContext.Patients
+                    .Include(p => p.Owner)
+                    .Include(p => p.AnimalType)
+                    .Include(p => p.Breed)
+                    .FirstOrDefault(p => p.Id == patient.Id);
+
+                if (patientToEdit == null)
+                {
+                    MessageBox.Show("Пациент не найден в базе данных");
+                    return;
+                }
+
+                var dialog = new PatientEditDialog(patientToEdit);
+                if (dialog.ShowDialog() == true)
+                {
+                    try
+                    {
+                        // Обновляем свойства
+                        patientToEdit.Name = dialog.PatientName;
+                        patientToEdit.OwnerId = dialog.OwnerId;
+                        patientToEdit.AnimalTypeId = dialog.AnimalTypeId;
+                        patientToEdit.BreedId = dialog.BreedId;
+                        patientToEdit.BirthDate = dialog.BirthDate;
+                        patientToEdit.Weight = dialog.Weight;
+                        patientToEdit.Color = dialog.Color;
+                        patientToEdit.DistinctiveFeatures = dialog.DistinctiveFeatures;
+                        patientToEdit.ChipNumber = dialog.ChipNumber;
+
+                        editContext.SaveChanges();
+
+                        // Обновляем данные в основном контексте
+                        LoadData();
+
+                        MessageBox.Show("Данные пациента успешно обновлены",
+                            "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+                    {
+                        string errorMessage = "Ошибки валидации:\n";
+                        foreach (var validationError in ex.EntityValidationErrors)
+                        {
+                            foreach (var error in validationError.ValidationErrors)
+                            {
+                                errorMessage += $"- {error.PropertyName}: {error.ErrorMessage}\n";
+                            }
+                        }
+                        MessageBox.Show(errorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
+                    {
+                        string errorMessage = $"Ошибка обновления: {ex.Message}";
+                        if (ex.InnerException != null)
+                        {
+                            errorMessage += $"\nВнутренняя ошибка: {ex.InnerException.Message}";
+                        }
+                        MessageBox.Show(errorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при сохранении: {ex.Message}",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
         }
 
@@ -120,6 +174,28 @@ namespace VetClinic.Pages
             }
 
             var patient = dataGrid.SelectedItem as Patient;
+
+            // Проверяем, есть ли связанные записи
+            try
+            {
+                using (var checkContext = new VeterContext())
+                {
+                    bool hasVisits = checkContext.Visits.Any(v => v.PatientId == patient.Id);
+                    if (hasVisits)
+                    {
+                        MessageBox.Show("Нельзя удалить пациента, у которого есть приёмы. Сначала удалите все приёмы пациента.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка проверки связанных записей: {ex.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var result = MessageBox.Show(
                 $"Вы уверены, что хотите удалить пациента '{patient.Name}'?",
                 "Подтверждение удаления",
@@ -128,9 +204,51 @@ namespace VetClinic.Pages
 
             if (result == MessageBoxResult.Yes)
             {
-                _context.Patients.Remove(patient);
-                _context.SaveChanges();
-                LoadData();
+                try
+                {
+                    // Загружаем пациента в текущий контекст для удаления
+                    var patientToDelete = _context.Patients
+                        .FirstOrDefault(p => p.Id == patient.Id);
+
+                    if (patientToDelete != null)
+                    {
+                        _context.Patients.Remove(patientToDelete);
+                        _context.SaveChanges();
+                        LoadData();
+
+                        MessageBox.Show("Пациент успешно удален",
+                            "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
+                {
+                    string errorMessage = "Ошибка при удалении пациента:\n";
+                    errorMessage += ex.Message;
+
+                    if (ex.InnerException != null)
+                    {
+                        errorMessage += $"\n\nВнутренняя ошибка: {ex.InnerException.Message}";
+
+                        // Проверяем, является ли ошибкой нарушение внешнего ключа
+                        if (ex.InnerException.InnerException != null)
+                        {
+                            var innerEx = ex.InnerException.InnerException;
+                            if (innerEx.Message.Contains("FK_") || innerEx.Message.Contains("REFERENCE"))
+                            {
+                                errorMessage += "\n\nПациент связан с другими записями в базе данных. " +
+                                               "Удалите сначала связанные записи.";
+                            }
+                        }
+                    }
+
+                    MessageBox.Show(errorMessage, "Ошибка удаления",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при удалении: {ex.Message}",
+                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

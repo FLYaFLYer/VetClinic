@@ -1,39 +1,148 @@
 ﻿<Window x:Class="VetClinic.Dialogs.VisitDetailsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Детали приёма" Height="400" Width="500">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="Детали приёма" 
+        Height="500" 
+        Width="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
 
-        <TextBlock Text="Дата приёма:" Grid.Row="0" FontWeight="Bold"/>
-        <TextBlock x:Name="txtVisitDate" Grid.Row="1" Margin="0,0,0,10"/>
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="LabelStyle">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,5,0,2"/>
+            <Setter Property="Foreground" Value="#FF333333"/>
+        </Style>
 
-        <TextBlock Text="Пациент:" Grid.Row="2" FontWeight="Bold"/>
-        <TextBlock x:Name="txtPatient" Grid.Row="3" Margin="0,0,0,10"/>
+        <Style TargetType="Border" x:Key="ValueBorderStyle">
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Background" Value="#FFF9F9F9"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="MinHeight" Value="24"/>
+        </Style>
 
-        <TextBlock Text="Диагноз:" Grid.Row="4" FontWeight="Bold"/>
-        <TextBlock x:Name="txtDiagnosis" Grid.Row="5" Margin="0,0,0,10"/>
+        <Style TargetType="TextBox" x:Key="ReadOnlyTextBoxStyle">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="Background" Value="#FFF9F9F9"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </Window.Resources>
 
-        <TextBlock Text="Симптомы:" Grid.Row="6" FontWeight="Bold"/>
-        <TextBox x:Name="txtSymptoms" Grid.Row="7" IsReadOnly="True" 
-                 Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"/>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="15">
+                <!-- Заголовок -->
+                <TextBlock Text="Детали приёма" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,15"
+                           Foreground="#FF4CAF50"/>
 
-        <TextBlock Text="Рекомендации:" Grid.Row="8" FontWeight="Bold"/>
-        <TextBox x:Name="txtRecommendations" Grid.Row="9" IsReadOnly="True"
-                 Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20"/>
+                <!-- Дата приёма -->
+                <TextBlock Text="Дата приёма:" Style="{StaticResource LabelStyle}"/>
+                <Border Style="{StaticResource ValueBorderStyle}">
+                    <TextBlock x:Name="txtVisitDate" 
+                               Margin="3,1"
+                               TextWrapping="Wrap"/>
+                </Border>
 
-        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Закрыть" Width="80" Click="BtnClose_Click"/>
-        </StackPanel>
+                <!-- Пациент -->
+                <TextBlock Text="Пациент:" Style="{StaticResource LabelStyle}"/>
+                <Border Style="{StaticResource ValueBorderStyle}">
+                    <TextBlock x:Name="txtPatient" 
+                               Margin="3,1"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Диагноз -->
+                <TextBlock Text="Диагноз:" Style="{StaticResource LabelStyle}"/>
+                <TextBox x:Name="txtDiagnosis" 
+                         Style="{StaticResource ReadOnlyTextBoxStyle}"
+                         Height="60"/>
+
+                <!-- Симптомы -->
+                <TextBlock Text="Симптомы:" Style="{StaticResource LabelStyle}"/>
+                <TextBox x:Name="txtSymptoms" 
+                         Style="{StaticResource ReadOnlyTextBoxStyle}"
+                         Height="80"/>
+
+                <!-- Температура и вес -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Температура -->
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Температура:" Style="{StaticResource LabelStyle}"/>
+                        <Border Style="{StaticResource ValueBorderStyle}">
+                            <TextBlock x:Name="txtTemperature" 
+                                       Margin="3,1"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Вес -->
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                        <TextBlock Text="Вес:" Style="{StaticResource LabelStyle}"/>
+                        <Border Style="{StaticResource ValueBorderStyle}">
+                            <TextBlock x:Name="txtWeight" 
+                                       Margin="3,1"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Рекомендации -->
+                <TextBlock Text="Рекомендации:" Style="{StaticResource LabelStyle}"/>
+                <TextBox x:Name="txtRecommendations" 
+                         Style="{StaticResource ReadOnlyTextBoxStyle}"
+                         Height="80"/>
+
+                <!-- Следующий визит -->
+                <TextBlock Text="Следующий визит:" Style="{StaticResource LabelStyle}"/>
+                <Border Style="{StaticResource ValueBorderStyle}">
+                    <TextBlock x:Name="txtNextVisit" 
+                               Margin="3,1"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Статус -->
+                <TextBlock Text="Статус:" Style="{StaticResource LabelStyle}"/>
+                <Border Style="{StaticResource ValueBorderStyle}">
+                    <TextBlock x:Name="txtStatus" 
+                               Margin="3,1"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Ветеринар -->
+                <TextBlock Text="Ветеринар:" Style="{StaticResource LabelStyle}"/>
+                <Border Style="{StaticResource ValueBorderStyle}">
+                    <TextBlock x:Name="txtVeterinarian" 
+                               Margin="3,1"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Кнопка закрытия -->
+                <Button Content="Закрыть" 
+                        Width="100" 
+                        Height="34"
+                        Margin="0,15,0,0"
+                        HorizontalAlignment="Right"
+                        Background="#FF4CAF50"
+                        Foreground="White"
+                        BorderBrush="#FF388E3C"
+                        BorderThickness="1"
+                        FontWeight="SemiBold"
+                        Click="BtnClose_Click"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

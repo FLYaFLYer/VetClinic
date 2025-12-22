@@ -24,8 +24,6 @@
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtLogin" 
                          Text="{Binding Login, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" 
-                         Padding="8,4"
                          Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Пароль -->
@@ -98,8 +96,6 @@
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtLastName" 
                          Text="{Binding LastName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" 
-                         Padding="8,4"
                          Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Имя -->
@@ -108,8 +104,6 @@
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtFirstName" 
                          Text="{Binding FirstName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" 
-                         Padding="8,4"
                          Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Отчество -->
@@ -118,8 +112,6 @@
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtMiddleName" 
                          Text="{Binding MiddleName}" 
-                         Height="34" 
-                         Padding="8,4"
                          Style="{StaticResource BaseTextBoxStyle}"/>
 
                 <!-- Телефон -->
@@ -128,10 +120,8 @@
                            Margin="0,10,0,5"/>
                 <TextBox x:Name="txtPhoneNumber" 
                          Text="{Binding PhoneNumber, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" 
-                         Height="34" 
-                         Padding="8,4"
-                         TextChanged="TxtPhoneNumber_TextChanged"
-                         Style="{StaticResource BaseTextBoxStyle}"/>
+                         Style="{StaticResource BaseTextBoxStyle}"
+                         TextChanged="TxtPhoneNumber_TextChanged"/>
 
                 <!-- Дата рождения -->
                 <TextBlock Text="Дата рождения:" 
@@ -139,7 +129,6 @@
                            Margin="0,10,0,5"/>
                 <DatePicker x:Name="dpDateOfBirth" 
                             SelectedDate="{Binding DateOfBirth, ValidatesOnDataErrors=True}" 
-                            Height="34"
                             Style="{StaticResource BaseDatePickerStyle}"/>
 
                 <!-- Дата приема -->
@@ -148,7 +137,6 @@
                            Margin="0,10,0,5"/>
                 <DatePicker x:Name="dpDateOfHire" 
                             SelectedDate="{Binding DateOfHire, ValidatesOnDataErrors=True}" 
-                            Height="34"
                             Style="{StaticResource BaseDatePickerStyle}"/>
 
                 <!-- Роль -->
@@ -159,8 +147,6 @@
                           DisplayMemberPath="Name" 
                           SelectedValuePath="Id" 
                           SelectedValue="{Binding RoleId, ValidatesOnDataErrors=True}" 
-                          Height="34" 
-                          Padding="8,4"
                           Style="{StaticResource BaseComboBoxStyle}"/>
 
                 <!-- Кнопки -->

@@ -28,13 +28,19 @@ namespace VetClinic.Dialogs
                 {
                     txtVisitDate.Text = visit.VisitDate.ToString("dd.MM.yyyy HH:mm");
                     txtPatient.Text = $"{visit.Patient?.Name} ({visit.Patient?.Owner?.FullName})";
-                    txtDiagnosis.Text = visit.Diagnosis;
+                    txtDiagnosis.Text = visit.Diagnosis ?? "Не указан";
                     txtSymptoms.Text = visit.Symptoms ?? "Не указаны";
+                    txtTemperature.Text = visit.TemperatureFormatted;
+                    txtWeight.Text = visit.WeightFormatted;
                     txtRecommendations.Text = visit.Recommendations ?? "Не указаны";
+                    txtNextVisit.Text = visit.NextVisitFormatted;
+                    txtStatus.Text = visit.Status ?? "Не указан";
+                    txtVeterinarian.Text = visit.User?.FullName ?? "Не указан";
                 }
                 else
                 {
-                    MessageBox.Show("Приём не найден");
+                    MessageBox.Show("Приём не найден", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                     Close();
                 }
             }

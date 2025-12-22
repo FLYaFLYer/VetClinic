@@ -1,13 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using VetClinic.Data;
 using VetClinic.Models;
 
 namespace VetClinic.Dialogs
 {
-    public partial class PatientEditDialog : Window
+    public partial class PatientEditDialog : Window, IDataErrorInfo
     {
         public string PatientName { get; set; }
         public int OwnerId { get; set; }
@@ -43,6 +46,8 @@ namespace VetClinic.Dialogs
             DataContext = this;
 
             cmbAnimalTypes.SelectionChanged += CmbAnimalTypes_SelectionChanged;
+            txtWeight.PreviewTextInput += TxtWeight_PreviewTextInput;
+            txtWeight.TextChanged += TxtWeight_TextChanged;
         }
 
         private void LoadData()
@@ -57,7 +62,7 @@ namespace VetClinic.Dialogs
             cmbBreeds.ItemsSource = _context.Breeds.Local;
         }
 
-        private void CmbAnimalTypes_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void CmbAnimalTypes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cmbAnimalTypes.SelectedItem is AnimalType selectedType)
             {
@@ -65,26 +70,149 @@ namespace VetClinic.Dialogs
                     .Where(b => b.AnimalTypeId == selectedType.Id)
                     .ToList();
                 cmbBreeds.ItemsSource = breeds;
+                cmbBreeds.SelectedIndex = -1;
+            }
+        }
+
+        private void TxtWeight_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Разрешаем только цифры, точку и запятую
+            if (!char.IsDigit(e.Text, 0) && e.Text != "." && e.Text != ",")
+            {
+                e.Handled = true;
+            }
+
+            // Проверяем, чтобы точка или запятая была только одна
+            string currentText = txtWeight.Text + e.Text;
+            if ((e.Text == "." || e.Text == ",") &&
+                (currentText.Count(c => c == '.' || c == ',') > 1))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void TxtWeight_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtWeight.Text))
+            {
+                Weight = null;
+                return;
+            }
+
+            string text = txtWeight.Text;
+            string cleaned = new string(text.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
+
+            cleaned = cleaned.Replace(',', '.');
+
+            if (cleaned != text)
+            {
+                txtWeight.Text = cleaned;
+                txtWeight.CaretIndex = cleaned.Length;
+            }
+
+            if (decimal.TryParse(cleaned, out decimal result))
+            {
+                Weight = result;
+            }
+            else
+            {
+                Weight = null;
+            }
+        }
+
+        public string Error => null;
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = null;
+
+                switch (columnName)
+                {
+                    case nameof(PatientName):
+                        if (string.IsNullOrWhiteSpace(PatientName))
+                            error = "Кличка обязательна";
+                        else if (PatientName.Length > 50)
+                            error = "Кличка не должна превышать 50 символов";
+                        break;
+
+                    case nameof(OwnerId):
+                        if (OwnerId <= 0)
+                            error = "Выберите владельца";
+                        break;
+
+                    case nameof(AnimalTypeId):
+                        if (AnimalTypeId <= 0)
+                            error = "Выберите вид животного";
+                        break;
+
+                    case nameof(Weight):
+                        if (Weight.HasValue)
+                        {
+                            if (Weight <= 0)
+                                error = "Вес должен быть положительным числом";
+                            else if (Weight > 1000)
+                                error = "Вес не может превышать 1000 кг";
+                        }
+                        break;
+
+                    case nameof(Color):
+                        if (!string.IsNullOrWhiteSpace(Color) && Color.Length > 50)
+                            error = "Цвет не должен превышать 50 символов";
+                        break;
+
+                    case nameof(ChipNumber):
+                        if (!string.IsNullOrWhiteSpace(ChipNumber) && ChipNumber.Length > 50)
+                            error = "Номер чипа не должен превышать 50 символов";
+                        break;
+
+                    case nameof(DistinctiveFeatures):
+                        if (!string.IsNullOrWhiteSpace(DistinctiveFeatures) && DistinctiveFeatures.Length > 500)
+                            error = "Особые приметы не должны превышать 500 символов";
+                        break;
+
+                    case nameof(BirthDate):
+                        if (BirthDate.HasValue)
+                        {
+                            if (BirthDate > DateTime.Now)
+                                error = "Дата рождения не может быть в будущем";
+                            else if (BirthDate < new DateTime(1900, 1, 1))
+                                error = "Некорректная дата рождения";
+                        }
+                        break;
+                }
+
+                return error;
             }
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(PatientName))
-            {
-                MessageBox.Show("Введите кличку животного");
-                return;
-            }
+            // Принудительно обновляем привязки
+            txtName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtWeight.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtColor.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtChipNumber.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            txtDistinctiveFeatures.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
 
-            if (OwnerId <= 0)
-            {
-                MessageBox.Show("Выберите владельца");
-                return;
-            }
+            // Обновляем привязки для ComboBox
+            var ownerBinding = cmbOwners.GetBindingExpression(ComboBox.SelectedValueProperty);
+            var animalTypeBinding = cmbAnimalTypes.GetBindingExpression(ComboBox.SelectedValueProperty);
+            ownerBinding?.UpdateSource();
+            animalTypeBinding?.UpdateSource();
 
-            if (AnimalTypeId <= 0)
+            // Проверяем ошибки валидации
+            if (Validation.GetHasError(txtName) ||
+                Validation.GetHasError(cmbOwners) ||
+                Validation.GetHasError(cmbAnimalTypes) ||
+                Validation.GetHasError(txtWeight) ||
+                Validation.GetHasError(txtColor) ||
+                Validation.GetHasError(txtChipNumber) ||
+                Validation.GetHasError(txtDistinctiveFeatures))
             {
-                MessageBox.Show("Выберите вид животного");
+                MessageBox.Show("Исправьте ошибки в форме перед сохранением",
+                    "Ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

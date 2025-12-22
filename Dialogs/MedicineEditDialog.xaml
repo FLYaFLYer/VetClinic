@@ -1,68 +1,94 @@
 ﻿<Window x:Class="VetClinic.Dialogs.MedicineEditDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Редактирование лекарства" Height="400" Width="400">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="Редактирование лекарства" 
+        Height="500" 
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
 
-        <TextBlock Text="Название:" Grid.Row="0"/>
-        <TextBox x:Name="txtName" Text="{Binding MedicineName}" Grid.Row="1" Margin="0,0,0,10"/>
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="15">
+                <!-- Заголовок -->
+                <TextBlock Text="Редактирование лекарства" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,15"
+                           Foreground="#FF4CAF50"/>
 
-        <TextBlock Text="Описание:" Grid.Row="2"/>
-        <TextBox x:Name="txtDescription" Text="{Binding Description}" Grid.Row="3" 
-                 Height="60" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"/>
+                <!-- Название -->
+                <TextBlock Text="Название:" FontWeight="SemiBold"/>
+                <TextBox x:Name="txtName" 
+                         Margin="0,5,0,10"
+                         Text="{Binding MedicineName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ValidatableTextBoxStyle}"
+                         Height="34"
+                         Padding="8,4"/>
 
-        <TextBlock Text="Категория:" Grid.Row="4"/>
-        <ComboBox x:Name="cmbCategory" SelectedItem="{Binding Category}" Grid.Row="5" Margin="0,0,0,10">
-            <ComboBoxItem>Антибиотики</ComboBoxItem>
-            <ComboBoxItem>Витамины</ComboBoxItem>
-            <ComboBoxItem>Вакцины</ComboBoxItem>
-            <ComboBoxItem>Антипаразитарные</ComboBoxItem>
-            <ComboBoxItem>Обезболивающие</ComboBoxItem>
-            <ComboBoxItem>ЖКТ</ComboBoxItem>
-            <ComboBoxItem>Перевязочные</ComboBoxItem>
-            <ComboBoxItem>Другое</ComboBoxItem>
-        </ComboBox>
+                <!-- Описание -->
+                <TextBlock Text="Описание:" FontWeight="SemiBold"/>
+                <TextBox x:Name="txtDescription" 
+                         Text="{Binding Description}" 
+                         Height="60" 
+                         VerticalScrollBarVisibility="Auto" 
+                         Margin="0,5,0,10"
+                         Style="{StaticResource BaseTextBoxStyle}"
+                         Padding="8,4"/>
 
-        <TextBlock Text="Цена:" Grid.Row="6"/>
-        <TextBox x:Name="txtPrice" Text="{Binding Price}" Grid.Row="7" Margin="0,0,0,10"/>
+                <!-- Категория -->
+                <TextBlock Text="Категория:" FontWeight="SemiBold"/>
+                <ComboBox x:Name="cmbCategory" 
+                          ItemsSource="{Binding Categories}"
+                          SelectedItem="{Binding Category}"
+                          Margin="0,5,0,10"
+                          Style="{StaticResource BaseComboBoxStyle}"
+                          Height="34"
+                          Padding="8,4"/>
 
-        <TextBlock Text="Единица измерения:" Grid.Row="8"/>
-        <ComboBox x:Name="cmbUnit" SelectedItem="{Binding Unit}" Grid.Row="9" Margin="0,0,0,10">
-            <ComboBoxItem>шт</ComboBoxItem>
-            <ComboBoxItem>уп</ComboBoxItem>
-            <ComboBoxItem>флакон</ComboBoxItem>
-            <ComboBoxItem>упак</ComboBoxItem>
-            <ComboBoxItem>туба</ComboBoxItem>
-            <ComboBoxItem>доза</ComboBoxItem>
-        </ComboBox>
+                <!-- Цена -->
+                <TextBlock Text="Цена:" FontWeight="SemiBold"/>
+                <TextBox x:Name="txtPrice" 
+                         Text="{Binding Price, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,5,0,10"
+                         Style="{StaticResource ValidatableTextBoxStyle}"
+                         Height="34"
+                         Padding="8,4"/>
 
-        <TextBlock Text="Минимальный запас:" Grid.Row="10"/>
-        <TextBox x:Name="txtMinStock" Text="{Binding MinStock}" Grid.Row="11" Margin="0,0,0,20"/>
+                <!-- Единица измерения -->
+                <TextBlock Text="Единица измерения:" FontWeight="SemiBold"/>
+                <ComboBox x:Name="cmbUnit" 
+                          ItemsSource="{Binding Units}"
+                          SelectedItem="{Binding Unit, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,5,0,10"
+                          Style="{StaticResource ValidatableComboBoxStyle}"
+                          Height="34"
+                          Padding="8,4"/>
 
-        <StackPanel Grid.Row="13" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Отмена" 
-                    Style="{StaticResource CancelButtonStyle}" 
-                    Click="BtnCancel_Click"
-                    Margin="0,0,20,0"/>
-            <Button Content="Сохранить" 
-                    Style="{StaticResource DialogButtonStyle}" 
-                    Click="BtnSave_Click"/>
-        </StackPanel>
+                <!-- Минимальный запас -->
+                <TextBlock Text="Минимальный запас:" FontWeight="SemiBold"/>
+                <TextBox x:Name="txtMinStock" 
+                         Text="{Binding MinStock, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,5,0,20"
+                         Style="{StaticResource ValidatableTextBoxStyle}"
+                         Height="34"
+                         Padding="8,4"/>
+
+                <!-- Кнопки -->
+                <Border BorderBrush="#FFEEEEEE" BorderThickness="0,1,0,0" Margin="0,10,0,0">
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Right" 
+                                Margin="0,20,0,0">
+                        <Button Content="Отмена" 
+                                Style="{StaticResource CancelButtonStyle}" 
+                                Click="BtnCancel_Click"/>
+                        <Button Content="Сохранить" 
+                                Style="{StaticResource DialogButtonStyle}" 
+                                Margin="10,0,0,0"
+                                Click="BtnSave_Click"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

@@ -6,11 +6,16 @@ namespace VetClinic
 {
     public partial class MainWindow : Window
     {
+        private Button _currentNavButton;
+
         public MainWindow()
         {
             InitializeComponent();
             LoadUserInfo();
             SetupNavigationBasedOnRole();
+
+            // Устанавливаем первую вкладку как активную
+            SetActiveNavButton(btnPatients);
             MainFrame.Navigate(new PatientsPage());
         }
 
@@ -26,10 +31,21 @@ namespace VetClinic
         {
             btnUsers.Visibility = App.CurrentRole == App.AdminRole ?
                 Visibility.Visible : Visibility.Collapsed;
+        }
 
-            if (App.CurrentRole == App.VetRole)
+        private void SetActiveNavButton(Button button)
+        {
+            // Сбрасываем стиль предыдущей активной кнопки
+            if (_currentNavButton != null)
             {
-                // Все кнопки доступны ветеринару
+                _currentNavButton.Style = (Style)FindResource("SidebarButton");
+            }
+
+            // Устанавливаем новый стиль для активной кнопки
+            if (button != null)
+            {
+                button.Style = (Style)FindResource("SidebarButtonActive");
+                _currentNavButton = button;
             }
         }
 
@@ -40,25 +56,43 @@ namespace VetClinic
 
             if (pageName == "Users")
             {
+                SetActiveNavButton(button);
                 var userManagement = new Dialogs.UserManagementWindow();
                 userManagement.ShowDialog();
+                // После закрытия диалога возвращаем выделение на предыдущую страницу
+                if (_currentNavButton == button)
+                {
+                    SetActiveNavButton(btnPatients);
+                }
                 return;
             }
 
+            // Устанавливаем активную кнопку
+            SetActiveNavButton(button);
+
             System.Windows.Controls.Page page = null;
 
-            if (pageName == "Patients")
-                page = new PatientsPage();
-            else if (pageName == "Medicines")
-                page = new MedicinesPage();
-            else if (pageName == "Visits")
-                page = new VisitsPage();
-            else if (pageName == "Owners")
-                page = new OwnersPage();
-            else if (pageName == "Reports")
-                page = new ReportsPage();
-            else
-                page = new PatientsPage();
+            switch (pageName)
+            {
+                case "Patients":
+                    page = new PatientsPage();
+                    break;
+                case "Medicines":
+                    page = new MedicinesPage();
+                    break;
+                case "Visits":
+                    page = new VisitsPage();
+                    break;
+                case "Owners":
+                    page = new OwnersPage();
+                    break;
+                case "Reports":
+                    page = new ReportsPage();
+                    break;
+                default:
+                    page = new PatientsPage();
+                    break;
+            }
 
             MainFrame.Navigate(page);
         }

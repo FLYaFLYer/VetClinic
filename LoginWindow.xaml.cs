@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows;
 using VetClinic.Data;
 using VetClinic.Models;
@@ -16,36 +15,24 @@ namespace VetClinic
             txtLogin.Focus();
         }
 
-        // Метод для форматирования номера телефона
-        private string FormatPhoneNumber(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return phone;
-
-            // Удаляем все нецифровые символы
-            string digits = Regex.Replace(phone, @"[^\d]", "");
-
-            if (digits.Length == 11)
-            {
-                return $"+7 ({digits.Substring(1, 3)}) {digits.Substring(4, 3)}-{digits.Substring(7, 2)}-{digits.Substring(9, 2)}";
-            }
-            else if (digits.Length == 10)
-            {
-                return $"+7 ({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6, 2)}-{digits.Substring(8, 2)}";
-            }
-
-            // Если номер не соответствует формату, возвращаем как есть
-            return phone;
-        }
-
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
             string login = txtLogin.Text.Trim();
             string password = txtPassword.Password;
 
-            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(login))
             {
-                MessageBox.Show("Введите логин и пароль");
+                MessageBox.Show("Введите логин", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                txtLogin.Focus();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Введите пароль", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPassword.Focus();
                 return;
             }
 
@@ -68,7 +55,8 @@ namespace VetClinic
                     }
                     else
                     {
-                        MessageBox.Show("Неверный логин или пароль");
+                        MessageBox.Show("Неверный логин или пароль", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
                         txtPassword.Password = "";
                         txtPassword.Focus();
                     }
@@ -80,7 +68,8 @@ namespace VetClinic
                     "Убедитесь, что:\n" +
                     "1. SQL Server LocalDB установлен\n" +
                     "2. База данных 'veterclinic' создана\n" +
-                    "3. Строка подключения в App.config правильная");
+                    "3. Строка подключения в App.config правильная",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -88,6 +77,22 @@ namespace VetClinic
         {
             var dialog = new Dialogs.ChangePasswordDialog();
             dialog.ShowDialog();
+        }
+
+        private void TxtLogin_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                BtnLogin_Click(sender, e);
+            }
+        }
+
+        private void TxtPassword_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                BtnLogin_Click(sender, e);
+            }
         }
     }
 }

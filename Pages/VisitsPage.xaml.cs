@@ -10,83 +10,116 @@ using System.Windows.Controls;
 
 namespace VetClinic.Pages
 {
-	public partial class VisitsPage : Page
-	{
-		private readonly VeterContext _context = new VeterContext();
+    public partial class VisitsPage : Page
+    {
+        private readonly VeterContext _context = new VeterContext();
 
-		public VisitsPage()
-		{
-			InitializeComponent();
-			CheckPermissions();
-			LoadData();
-		}
+        public VisitsPage()
+        {
+            InitializeComponent();
+            CheckPermissions();
+            LoadData();
+        }
 
-		private void CheckPermissions()
-		{
-			if (!AccessManager.CanEditVisits(App.CurrentRole))
-			{
-				btnAddVisit.IsEnabled = false;
-			}
-		}
+        private void CheckPermissions()
+        {
+            if (!AccessManager.CanEditVisits(App.CurrentRole))
+            {
+                btnAddVisit.IsEnabled = false;
+                btnEditVisit.IsEnabled = false;
+            }
+        }
 
-		private void LoadData(DateTime? filterDate = null)
-		{
-			var query = _context.Visits
-				.Include(v => v.Patient)
-				.Include(v => v.Patient.Owner)
-				.Include(v => v.User)
-				.OrderByDescending(v => v.VisitDate);
+        private void LoadData(DateTime? filterDate = null)
+        {
+            var query = _context.Visits
+                .Include(v => v.Patient)
+                .Include(v => v.Patient.Owner)
+                .Include(v => v.User)
+                .OrderByDescending(v => v.VisitDate);
 
-			if (filterDate.HasValue)
-			{
-				query = query.Where(v => DbFunctions.TruncateTime(v.VisitDate) == filterDate.Value.Date)
-					.OrderByDescending(v => v.VisitDate);
-			}
+            if (filterDate.HasValue)
+            {
+                var date = filterDate.Value.Date;
+                query = query.Where(v => DbFunctions.TruncateTime(v.VisitDate) == date)
+                    .OrderByDescending(v => v.VisitDate);
+            }
 
-			query.Load();
-			dataGrid.ItemsSource = _context.Visits.Local;
-		}
+            query.Load();
+            dataGrid.ItemsSource = _context.Visits.Local;
+        }
 
-		private void BtnAddVisit_Click(object sender, RoutedEventArgs e)
-		{
-			if (!AccessManager.CanEditVisits(App.CurrentRole))
-			{
-				MessageBox.Show("Нет прав для добавления приёмов");
-				return;
-			}
+        private void BtnAddVisit_Click(object sender, RoutedEventArgs e)
+        {
+            if (!AccessManager.CanEditVisits(App.CurrentRole))
+            {
+                MessageBox.Show("Нет прав для добавления приёмов");
+                return;
+            }
 
-			var dialog = new VisitEditDialog();
-			if (dialog.ShowDialog() == true)
-			{
-				LoadData();
-			}
-		}
+            var dialog = new VisitEditDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                LoadData();
+            }
+        }
 
-		private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
-		{
-			if (dataGrid.SelectedItem == null)
-			{
-				MessageBox.Show("Выберите приём");
-				return;
-			}
+        private void BtnEditVisit_Click(object sender, RoutedEventArgs e)
+        {
+            if (!AccessManager.CanEditVisits(App.CurrentRole))
+            {
+                MessageBox.Show("Нет прав для редактирования приёмов");
+                return;
+            }
 
-			var visit = (Visit)dataGrid.SelectedItem;
-			var dialog = new VisitDetailsDialog(visit);
-			dialog.ShowDialog();
-		}
+            if (dataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите приём");
+                return;
+            }
 
-		private void DpFilterDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if (dpFilterDate.SelectedDate.HasValue)
-			{
-				LoadData(dpFilterDate.SelectedDate.Value);
-			}
-		}
+            var visit = (Visit)dataGrid.SelectedItem;
+            var dialog = new VisitEditDialog(visit);
+            if (dialog.ShowDialog() == true)
+            {
+                LoadData();
+            }
+        }
 
-		private void BtnClearFilter_Click(object sender, RoutedEventArgs e)
-		{
-			dpFilterDate.SelectedDate = null;
-			LoadData();
-		}
-	}
+        private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите приём");
+                return;
+            }
+
+            var visit = (Visit)dataGrid.SelectedItem;
+            var dialog = new VisitDetailsDialog(visit);
+            dialog.ShowDialog();
+        }
+
+        private void DpFilterDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dpFilterDate.SelectedDate.HasValue)
+            {
+                LoadData(dpFilterDate.SelectedDate.Value);
+            }
+            else
+            {
+                LoadData();
+            }
+        }
+
+        private void BtnClearFilter_Click(object sender, RoutedEventArgs e)
+        {
+            dpFilterDate.SelectedDate = null;
+            LoadData();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _context?.Dispose();
+        }
+    }
 }

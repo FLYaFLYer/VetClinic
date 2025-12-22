@@ -46,6 +46,13 @@
             <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
+
+        <!-- Стиль для активной кнопки боковой панели -->
+        <Style TargetType="Button" x:Key="SidebarButtonActive" BasedOn="{StaticResource SidebarButton}">
+            <Setter Property="Background" Value="#FF4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -109,7 +116,7 @@
                     Background="#FFF9F9F9" 
                     BorderBrush="#FFEEEEEE" 
                     BorderThickness="0,0,1,0">
-                <StackPanel Margin="0,20,0,0">
+                <StackPanel x:Name="sidebarPanel" Margin="0,20,0,0">
                     <Button x:Name="btnPatients" 
                             Content="🐶 Пациенты" 
                             Style="{StaticResource SidebarButton}"
