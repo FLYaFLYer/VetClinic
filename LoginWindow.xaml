@@ -4,7 +4,7 @@
         Title="Ветеринарная клиника - Авторизация" 
         Height="350" 
         Width="400"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         Background="#FFf0f0f0">
     <Grid>
         <Border CornerRadius="15" 

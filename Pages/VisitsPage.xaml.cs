@@ -3,6 +3,7 @@ using VetClinic.Dialogs;
 using VetClinic.Models;
 using VetClinic.Utils;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
@@ -32,22 +33,44 @@ namespace VetClinic.Pages
 
         private void LoadData(DateTime? filterDate = null)
         {
-            var query = _context.Visits
-                .Include(v => v.Patient)
-                .Include(v => v.Patient.Owner)
-                .Include(v => v.User)
-                .OrderByDescending(v => v.VisitDate);
-
-            if (filterDate.HasValue)
+            try
             {
-                var date = filterDate.Value.Date;
-                // Исправлено (45 проблема) - правильная фильтрация по дате
-                query = query.Where(v => System.Data.Entity.DbFunctions.TruncateTime(v.VisitDate) == date)
-                    .OrderByDescending(v => v.VisitDate);
-            }
+                List<Visit> visits;
 
-            query.Load();
-            dataGrid.ItemsSource = _context.Visits.Local;
+                if (filterDate.HasValue)
+                {
+                    // Способ 1: Загружаем все данные и фильтруем в памяти
+                    var allVisits = _context.Visits
+                        .Include(v => v.Patient)
+                        .Include(v => v.Patient.Owner)
+                        .Include(v => v.User)
+                        .ToList();
+
+                    var targetDate = filterDate.Value.Date;
+                    visits = allVisits
+                        .Where(v => v.VisitDate.Date == targetDate)
+                        .OrderByDescending(v => v.VisitDate)
+                        .ToList();
+                }
+                else
+                {
+                    // Без фильтра
+                    visits = _context.Visits
+                        .Include(v => v.Patient)
+                        .Include(v => v.Patient.Owner)
+                        .Include(v => v.User)
+                        .OrderByDescending(v => v.VisitDate)
+                        .ToList();
+                }
+
+                dataGrid.ItemsSource = visits;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                dataGrid.ItemsSource = null;
+            }
         }
 
         private void BtnAddVisit_Click(object sender, RoutedEventArgs e)
@@ -61,7 +84,7 @@ namespace VetClinic.Pages
             var dialog = new VisitEditDialog();
             if (dialog.ShowDialog() == true)
             {
-                LoadData();
+                LoadData(dpFilterDate.SelectedDate);
             }
         }
 
@@ -83,7 +106,7 @@ namespace VetClinic.Pages
             var dialog = new VisitEditDialog(visit);
             if (dialog.ShowDialog() == true)
             {
-                LoadData();
+                LoadData(dpFilterDate.SelectedDate);
             }
         }
 
@@ -102,15 +125,7 @@ namespace VetClinic.Pages
 
         private void DpFilterDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (dpFilterDate.SelectedDate.HasValue)
-            {
-                // Исправлено (45 проблема) - фильтрация по выбранной дате
-                LoadData(dpFilterDate.SelectedDate.Value);
-            }
-            else
-            {
-                LoadData();
-            }
+            LoadData(dpFilterDate.SelectedDate);
         }
 
         private void BtnClearFilter_Click(object sender, RoutedEventArgs e)
@@ -124,4 +139,4 @@ namespace VetClinic.Pages
             _context?.Dispose();
         }
     }
-}
+}   

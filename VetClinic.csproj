@@ -236,6 +236,7 @@
       <DependentUpon>MainDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Utils\AccessManager.cs" />
+    <Compile Include="Utils\DateExtensions.cs" />
     <Compile Include="Utils\ExcelExporter.cs" />
     <Compile Include="Utils\NotificationHelper.cs" />
     <Compile Include="Utils\PhoneNumberHelper.cs" />
