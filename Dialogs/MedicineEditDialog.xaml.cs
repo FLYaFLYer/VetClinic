@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,6 +28,8 @@ namespace VetClinic.Dialogs
         {
             "шт", "уп", "флакон", "упак", "туба", "доза", "мл", "г", "кг"
         };
+
+        private Dictionary<string, string> _validationErrors = new Dictionary<string, string>();
 
         public MedicineEditDialog(Models.Medicine medicine = null)
         {
@@ -55,6 +58,12 @@ namespace VetClinic.Dialogs
 
             txtPrice.PreviewTextInput += TxtPrice_PreviewTextInput;
             txtMinStock.PreviewTextInput += TxtMinStock_PreviewTextInput;
+
+            // Добавляем обработчики для проверки в реальном времени
+            txtName.TextChanged += ValidateTextBox;
+            txtPrice.TextChanged += ValidateTextBox;
+            txtMinStock.TextChanged += ValidateTextBox;
+            cmbUnit.SelectionChanged += ValidateComboBox;
         }
 
         private void TxtPrice_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -63,6 +72,7 @@ namespace VetClinic.Dialogs
             if (!char.IsDigit(e.Text, 0) && e.Text != "." && e.Text != ",")
             {
                 e.Handled = true;
+                return;
             }
 
             // Проверяем, чтобы точка или запятая была только одна
@@ -127,7 +137,34 @@ namespace VetClinic.Dialogs
                         break;
                 }
 
+                _validationErrors[columnName] = error;
                 return error;
+            }
+        }
+
+        private void ValidateTextBox(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                string propertyName = textBox.Name.Replace("txt", "");
+
+                // Принудительно вызываем валидацию
+                if (propertyName == "Name")
+                    Validation.GetErrors(textBox);
+                else if (propertyName == "Price")
+                    Validation.GetErrors(textBox);
+                else if (propertyName == "MinStock")
+                    Validation.GetErrors(textBox);
+            }
+        }
+
+        private void ValidateComboBox(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null && comboBox.Name == "cmbUnit")
+            {
+                Validation.GetErrors(comboBox);
             }
         }
 
@@ -137,18 +174,87 @@ namespace VetClinic.Dialogs
             txtName.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
             txtPrice.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
             txtMinStock.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
-
-            // Обновляем привязки для ComboBox
             cmbUnit.GetBindingExpression(System.Windows.Controls.Primitives.Selector.SelectedValueProperty)?.UpdateSource();
 
             // Проверяем ошибки валидации
-            if (Validation.GetHasError(txtName) ||
-                Validation.GetHasError(txtPrice) ||
-                Validation.GetHasError(txtMinStock) ||
-                Validation.GetHasError(cmbUnit))
+            bool hasErrors = Validation.GetHasError(txtName) ||
+                             Validation.GetHasError(txtPrice) ||
+                             Validation.GetHasError(txtMinStock) ||
+                             Validation.GetHasError(cmbUnit);
+
+            if (hasErrors)
             {
-                MessageBox.Show("Исправьте ошибки в форме перед сохранением",
+                // Собираем все сообщения об ошибках
+                StringBuilder errorMessages = new StringBuilder();
+                errorMessages.AppendLine("Обнаружены ошибки в форме:");
+                errorMessages.AppendLine();
+
+                if (Validation.GetHasError(txtName))
+                {
+                    errorMessages.AppendLine($"• Название: {Validation.GetErrors(txtName)[0].ErrorContent}");
+                }
+
+                if (Validation.GetHasError(txtPrice))
+                {
+                    errorMessages.AppendLine($"• Цена: {Validation.GetErrors(txtPrice)[0].ErrorContent}");
+                }
+
+                if (Validation.GetHasError(cmbUnit))
+                {
+                    errorMessages.AppendLine($"• Единица измерения: {Validation.GetErrors(cmbUnit)[0].ErrorContent}");
+                }
+
+                if (Validation.GetHasError(txtMinStock))
+                {
+                    errorMessages.AppendLine($"• Минимальный запас: {Validation.GetErrors(txtMinStock)[0].ErrorContent}");
+                }
+
+                MessageBox.Show(errorMessages.ToString(),
                     "Ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // Устанавливаем фокус на первое поле с ошибкой
+                if (Validation.GetHasError(txtName))
+                    txtName.Focus();
+                else if (Validation.GetHasError(txtPrice))
+                    txtPrice.Focus();
+                else if (Validation.GetHasError(cmbUnit))
+                    cmbUnit.Focus();
+                else if (Validation.GetHasError(txtMinStock))
+                    txtMinStock.Focus();
+
+                return;
+            }
+
+            // Дополнительные проверки
+            if (string.IsNullOrWhiteSpace(MedicineName))
+            {
+                MessageBox.Show("Название лекарства обязательно", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                txtName.Focus();
+                return;
+            }
+
+            if (Price <= 0)
+            {
+                MessageBox.Show("Цена должна быть положительным числом", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPrice.Focus();
+                return;
+            }
+
+            if (MinStock <= 0)
+            {
+                MessageBox.Show("Минимальный запас должен быть положительным числом", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                txtMinStock.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(Unit))
+            {
+                MessageBox.Show("Выберите единицу измерения", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                cmbUnit.Focus();
                 return;
             }
 

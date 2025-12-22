@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
@@ -48,6 +49,16 @@ namespace VetClinic.Dialogs
             cmbAnimalTypes.SelectionChanged += CmbAnimalTypes_SelectionChanged;
             txtWeight.PreviewTextInput += TxtWeight_PreviewTextInput;
             txtWeight.TextChanged += TxtWeight_TextChanged;
+
+            // Добавляем обработчики валидации
+            txtName.TextChanged += ValidateTextBox;
+            txtWeight.TextChanged += ValidateTextBox;
+            txtColor.TextChanged += ValidateTextBox;
+            txtChipNumber.TextChanged += ValidateTextBox;
+            txtDistinctiveFeatures.TextChanged += ValidateTextBox;
+
+            cmbOwners.SelectionChanged += ValidateComboBox;
+            cmbAnimalTypes.SelectionChanged += ValidateComboBox;
         }
 
         private void LoadData()
@@ -187,6 +198,24 @@ namespace VetClinic.Dialogs
             }
         }
 
+        private void ValidateTextBox(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox != null)
+            {
+                Validation.GetErrors(textBox);
+            }
+        }
+
+        private void ValidateComboBox(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null)
+            {
+                Validation.GetErrors(comboBox);
+            }
+        }
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             // Принудительно обновляем привязки
@@ -202,17 +231,41 @@ namespace VetClinic.Dialogs
             ownerBinding?.UpdateSource();
             animalTypeBinding?.UpdateSource();
 
+            // Собираем все ошибки
+            var errors = new List<string>();
+
+            if (!string.IsNullOrEmpty(this["PatientName"]))
+                errors.Add($"Кличка: {this["PatientName"]}");
+            if (!string.IsNullOrEmpty(this["OwnerId"]))
+                errors.Add($"Владелец: {this["OwnerId"]}");
+            if (!string.IsNullOrEmpty(this["AnimalTypeId"]))
+                errors.Add($"Вид животного: {this["AnimalTypeId"]}");
+            if (!string.IsNullOrEmpty(this["Weight"]))
+                errors.Add($"Вес: {this["Weight"]}");
+            if (!string.IsNullOrEmpty(this["Color"]))
+                errors.Add($"Цвет: {this["Color"]}");
+            if (!string.IsNullOrEmpty(this["ChipNumber"]))
+                errors.Add($"Номер чипа: {this["ChipNumber"]}");
+            if (!string.IsNullOrEmpty(this["DistinctiveFeatures"]))
+                errors.Add($"Особые приметы: {this["DistinctiveFeatures"]}");
+            if (!string.IsNullOrEmpty(this["BirthDate"]))
+                errors.Add($"Дата рождения: {this["BirthDate"]}");
+
             // Проверяем ошибки валидации
-            if (Validation.GetHasError(txtName) ||
-                Validation.GetHasError(cmbOwners) ||
-                Validation.GetHasError(cmbAnimalTypes) ||
-                Validation.GetHasError(txtWeight) ||
-                Validation.GetHasError(txtColor) ||
-                Validation.GetHasError(txtChipNumber) ||
-                Validation.GetHasError(txtDistinctiveFeatures))
+            if (errors.Any())
             {
-                MessageBox.Show("Исправьте ошибки в форме перед сохранением",
+                string errorMessage = "Обнаружены ошибки:\n\n" + string.Join("\n", errors);
+                MessageBox.Show(errorMessage,
                     "Ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // Устанавливаем фокус на первое поле с ошибкой
+                if (!string.IsNullOrEmpty(this["PatientName"]))
+                    txtName.Focus();
+                else if (!string.IsNullOrEmpty(this["OwnerId"]))
+                    cmbOwners.Focus();
+                else if (!string.IsNullOrEmpty(this["AnimalTypeId"]))
+                    cmbAnimalTypes.Focus();
+
                 return;
             }
 
