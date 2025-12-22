@@ -18,27 +18,74 @@ namespace VetClinic.Dialogs
 
         private void LoadNotifications()
         {
-            _context.Notifications
-                .Include(n => n.Medicine)
-                .OrderByDescending(n => n.CreatedDate)
-                .Load();
+            try
+            {
+                _context.Notifications
+                    .Include(n => n.Medicine)
+                    .OrderByDescending(n => n.CreatedDate)
+                    .Load();
 
-            dataGrid.ItemsSource = _context.Notifications.Local;
+                dataGrid.ItemsSource = _context.Notifications.Local;
+
+                // Обновляем счетчик
+                int unreadCount = _context.Notifications.Local.Count(n => !n.IsRead);
+                int totalCount = _context.Notifications.Local.Count;
+
+                tbNotificationCount.Text = $"Уведомлений: {totalCount} (новых: {unreadCount})";
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки уведомлений: {ex.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnMarkAsRead_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var notification in _context.Notifications.Local.Where(n => !n.IsRead))
+            var unreadNotifications = _context.Notifications.Local.Where(n => !n.IsRead).ToList();
+
+            if (unreadNotifications.Count == 0)
             {
-                notification.IsRead = true;
+                MessageBox.Show("Нет непрочитанных уведомлений",
+                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-            _context.SaveChanges();
+
+            var result = MessageBox.Show(
+                $"Пометить все {unreadNotifications.Count} непрочитанных уведомлений как прочитанные?",
+                "Подтверждение",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                foreach (var notification in unreadNotifications)
+                {
+                    notification.IsRead = true;
+                }
+
+                _context.SaveChanges();
+                LoadNotifications();
+
+                MessageBox.Show("Все уведомления помечены как прочитанные",
+                    "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
             LoadNotifications();
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        protected override void OnClosed(System.EventArgs e)
+        {
+            base.OnClosed(e);
+            _context?.Dispose();
         }
     }
 }

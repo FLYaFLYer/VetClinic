@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using VetClinic.Data;
@@ -303,6 +305,75 @@ namespace VetClinic.Pages
             var patient = dataGrid.SelectedItem as Patient;
             var dialog = new PatientHistoryDialog(patient);
             dialog.ShowDialog();
+        }
+
+        // Метод для просмотра особых примет (27 проблема)
+        private void ViewFeatures_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button != null && button.Tag is string features)
+            {
+                if (!string.IsNullOrEmpty(features))
+                {
+                    var dialog = new Window
+                    {
+                        Title = "Особые приметы",
+                        Width = 500,
+                        Height = 400,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        Owner = Application.Current.MainWindow,
+                        WindowStyle = WindowStyle.ToolWindow,
+                        ResizeMode = ResizeMode.CanResize
+                    };
+
+                    var scrollViewer = new ScrollViewer
+                    {
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                        HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                        Margin = new Thickness(10)
+                    };
+
+                    var textBlock = new TextBlock
+                    {
+                        Text = features,
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 14,
+                        Padding = new Thickness(5)
+                    };
+
+                    scrollViewer.Content = textBlock;
+
+                    var closeButton = new Button
+                    {
+                        Content = "Закрыть",
+                        Width = 100,
+                        Height = 36,
+                        Margin = new Thickness(0, 10, 10, 10),
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Style = (Style)FindResource("NavButtonStyle")
+                    };
+
+                    closeButton.Click += (s, args) => dialog.Close();
+
+                    var grid = new Grid();
+                    grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                    Grid.SetRow(scrollViewer, 0);
+                    Grid.SetRow(closeButton, 1);
+
+                    grid.Children.Add(scrollViewer);
+                    grid.Children.Add(closeButton);
+
+                    dialog.Content = grid;
+                    dialog.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("Особые приметы не указаны",
+                        "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
         }
     }
 }

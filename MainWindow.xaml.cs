@@ -1,22 +1,42 @@
-﻿using System.Windows;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
-using VetClinic.Pages;
+using VetClinic.Data;
+using VetClinic.Models;
 
 namespace VetClinic
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private Button _currentNavButton;
+        private int _unreadCount;
+        private readonly VeterContext _context = new VeterContext();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int UnreadCount
+        {
+            get => _unreadCount;
+            set
+            {
+                _unreadCount = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UnreadCount)));
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             LoadUserInfo();
             SetupNavigationBasedOnRole();
+            LoadNotificationsCount();
 
             // Устанавливаем первую вкладку как активную
             SetActiveNavButton(btnPatients);
-            MainFrame.Navigate(new PatientsPage());
+            MainFrame.Navigate(new Pages.PatientsPage());
         }
 
         private void LoadUserInfo()
@@ -24,6 +44,19 @@ namespace VetClinic
             if (App.CurrentUser != null)
             {
                 tbUserInfo.Text = $"{App.CurrentUser.FullName} ({App.CurrentRole})";
+            }
+        }
+
+        private void LoadNotificationsCount()
+        {
+            try
+            {
+                UnreadCount = _context.Notifications.Count(n => !n.IsRead);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка загрузки уведомлений: {ex.Message}");
+                UnreadCount = 0;
             }
         }
 
@@ -75,22 +108,22 @@ namespace VetClinic
             switch (pageName)
             {
                 case "Patients":
-                    page = new PatientsPage();
+                    page = new Pages.PatientsPage();
                     break;
                 case "Medicines":
-                    page = new MedicinesPage();
+                    page = new Pages.MedicinesPage();
                     break;
                 case "Visits":
-                    page = new VisitsPage();
+                    page = new Pages.VisitsPage();
                     break;
                 case "Owners":
-                    page = new OwnersPage();
+                    page = new Pages.OwnersPage();
                     break;
                 case "Reports":
-                    page = new ReportsPage();
+                    page = new Pages.ReportsPage();
                     break;
                 default:
-                    page = new PatientsPage();
+                    page = new Pages.PatientsPage();
                     break;
             }
 
@@ -100,6 +133,7 @@ namespace VetClinic
         private void BtnNotifications_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Dialogs.NotificationsDialog();
+            dialog.Closed += (s, args) => LoadNotificationsCount();
             dialog.ShowDialog();
         }
 
@@ -111,6 +145,12 @@ namespace VetClinic
             var loginWindow = new LoginWindow();
             loginWindow.Show();
             Close();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            _context?.Dispose();
         }
     }
 }

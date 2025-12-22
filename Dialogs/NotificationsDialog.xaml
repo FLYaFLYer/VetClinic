@@ -1,9 +1,13 @@
 ﻿<Window x:Class="VetClinic.Dialogs.NotificationsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Уведомления" Height="400" Width="600"
+        Title="Уведомления" 
+        Height="500" 
+        Width="700"
         WindowStartupLocation="CenterOwner"
-        >
+        MinHeight="400"
+        MinWidth="600">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -11,19 +15,118 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Уведомления" Grid.Row="0" Margin="10" FontSize="16" FontWeight="Bold"/>
+        <!-- Заголовок -->
+        <Border Grid.Row="0" 
+                Background="#FF4CAF50" 
+                Padding="15">
+            <StackPanel>
+                <TextBlock Text="Уведомления" 
+                           FontSize="18" 
+                           FontWeight="Bold"
+                           Foreground="White"/>
+                <TextBlock Text="Системные уведомления о низких запасах лекарств"
+                           FontSize="12"
+                           Foreground="#E0F7FA"
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
 
-        <DataGrid x:Name="dataGrid" Grid.Row="1" Margin="10" AutoGenerateColumns="False" IsReadOnly="True">
+        <!-- Панель инструментов -->
+        <Border Grid.Row="0" 
+                Background="#FFF9F9F9" 
+                BorderBrush="#FFEEEEEE" 
+                BorderThickness="0,0,0,1"
+                Padding="15,10"
+                Margin="0,50,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btnMarkAsRead" 
+                        Content="Пометить как прочитанные"
+                        Style="{StaticResource NavButtonStyle}"
+                        Height="36"
+                        Padding="12,8"
+                        Click="BtnMarkAsRead_Click"/>
+                <Button x:Name="btnRefresh" 
+                        Content="Обновить"
+                        Style="{StaticResource NavButtonStyle}"
+                        Height="36"
+                        Padding="12,8"
+                        Margin="10,0,0,0"
+                        Click="BtnRefresh_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Список уведомлений -->
+        <DataGrid x:Name="dataGrid" 
+                  Grid.Row="1" 
+                  Margin="15,10,15,10"
+                  AutoGenerateColumns="False"
+                  SelectionMode="Single"
+                  IsReadOnly="True">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Дата" Binding="{Binding CreatedDate, StringFormat=dd.MM.yyyy HH:mm}" Width="120"/>
-                <DataGridTextColumn Header="Сообщение" Binding="{Binding Message}" Width="*"/>
-                <DataGridCheckBoxColumn Header="Прочитано" Binding="{Binding IsRead}" Width="80"/>
+                <DataGridTemplateColumn Header="Статус" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Width="12" 
+                                    Height="12" 
+                                    CornerRadius="6"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#FF4CAF50"/>
+                                        <Setter Property="ToolTip" Value="Прочитано"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRead}" Value="False">
+                                                <Setter Property="Background" Value="#FFF44336"/>
+                                                <Setter Property="ToolTip" Value="Новое"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дата" 
+                                    Binding="{Binding CreatedDate, StringFormat=dd.MM.yyyy HH:mm}" 
+                                    Width="120"/>
+                <DataGridTextColumn Header="Лекарство" Width="150">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Medicine.Name" Mode="OneWay"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Сообщение" 
+                                    Binding="{Binding Message}" 
+                                    Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5,3"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="Пометить как прочитанные" Margin="0,0,10,0" Click="BtnMarkAsRead_Click"/>
-            <Button Content="Закрыть" Width="80" Click="BtnClose_Click"/>
-        </StackPanel>
+        <!-- Нижняя панель -->
+        <Border Grid.Row="2" 
+                Background="#FFF9F9F9" 
+                BorderBrush="#FFEEEEEE" 
+                BorderThickness="0,1,0,0"
+                Padding="15">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock x:Name="tbNotificationCount" 
+                           VerticalAlignment="Center"
+                           Margin="0,0,20,0"
+                           FontWeight="SemiBold"/>
+                <Button Content="Закрыть" 
+                        Width="100"
+                        Height="36"
+                        Style="{StaticResource NavButtonStyle}"
+                        Click="BtnClose_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

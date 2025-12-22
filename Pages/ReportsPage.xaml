@@ -9,31 +9,60 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Text="Отчёты" FontSize="18" FontWeight="Bold"/>
-            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <ComboBox x:Name="cmbReportType" Width="250" SelectedIndex="0">
-                    <ComboBoxItem Content="Статистика приёмов"/>
-                    <ComboBoxItem Content="Лекарства с низким запасом"/>
-                    <ComboBoxItem Content="Пациенты по видам"/>
-                </ComboBox>
+            <TextBlock Text="Отчёты" 
+                       FontSize="18" 
+                       FontWeight="Bold"
+                       Margin="0,0,0,5"/>
 
-                <DatePicker x:Name="dpStartDate" Margin="10,0,0,0" Width="120"/>
-                <DatePicker x:Name="dpEndDate" Margin="5,0,0,0" Width="120"/>
+            <Border Background="#FFF9F9F9" 
+                    BorderBrush="#FFEEEEEE" 
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="15,10">
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox x:Name="cmbReportType" 
+                              Width="250" 
+                              SelectedIndex="0"
+                              Style="{StaticResource BaseComboBoxStyle}">
+                        <ComboBoxItem Content="Статистика приёмов"/>
+                        <ComboBoxItem Content="Лекарства с низким запасом"/>
+                        <ComboBoxItem Content="Пациенты по видам"/>
+                    </ComboBox>
 
-                <Button Content="Сформировать" 
-                        Margin="10,0,0,0" 
-                        Padding="10,5"
-                        Style="{StaticResource NavButtonStyle}"
-                        Click="BtnGenerate_Click"/>
+                    <TextBlock Text="Период:" 
+                               VerticalAlignment="Center" 
+                               Margin="20,0,5,0" 
+                               FontWeight="SemiBold" 
+                               FontSize="14"/>
+                    <DatePicker x:Name="dpStartDate" 
+                                Margin="0,0,5,0" 
+                                Width="120"
+                                Style="{StaticResource BaseDatePickerStyle}"/>
+                    <TextBlock Text="—" 
+                               VerticalAlignment="Center" 
+                               Margin="0,0,5,0"/>
+                    <DatePicker x:Name="dpEndDate" 
+                                Margin="0,0,20,0" 
+                                Width="120"
+                                Style="{StaticResource BaseDatePickerStyle}"/>
 
-                <Button Content="Экспорт в Excel" 
-                        Margin="10,0,0,0" 
-                        Padding="10,5"
-                        Style="{StaticResource NavButtonStyle}"
-                        Click="BtnExport_Click"/>
-            </StackPanel>
+                    <Button Content="Сформировать" 
+                            Style="{StaticResource NavButtonStyle}"
+                            Height="36"
+                            Padding="12,8"
+                            Click="BtnGenerate_Click"/>
+                    <Button Content="Экспорт в Excel" 
+                            Style="{StaticResource NavButtonStyle}"
+                            Height="36"
+                            Padding="12,8"
+                            Margin="10,0,0,0"
+                            Click="BtnExport_Click"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
 
-        <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False"/>
+        <DataGrid x:Name="dataGrid" 
+                  Grid.Row="1" 
+                  AutoGenerateColumns="False"/>
     </Grid>
 </Page>
