@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using VetClinic.Utils;
 
 namespace VetClinic.Dialogs
 {
@@ -22,31 +23,25 @@ namespace VetClinic.Dialogs
             {
                 LastName = owner.LastName;
                 FirstName = owner.FirstName;
-                Phone = FormatPhoneNumber(owner.Phone);
+                Phone = PhoneNumberHelper.FormatPhoneNumber(owner.Phone);
                 Email = owner.Email;
                 Address = owner.Address;
             }
+            else
+            {
+                // Пример номера (59 проблема)
+                Phone = "+7 (___) ___-__-__";
+            }
 
             DataContext = this;
+
+            txtPhone.GotFocus += TxtPhone_GotFocus;
+            txtPhone.LostFocus += TxtPhone_LostFocus;
         }
 
         private string FormatPhoneNumber(string phone)
         {
-            if (string.IsNullOrWhiteSpace(phone))
-                return phone;
-
-            string digits = Regex.Replace(phone, @"[^\d]", "");
-
-            if (digits.Length == 11 && digits.StartsWith("7"))
-            {
-                return $"+7 ({digits.Substring(1, 3)}) {digits.Substring(4, 3)}-{digits.Substring(7, 2)}-{digits.Substring(9, 2)}";
-            }
-            else if (digits.Length == 10)
-            {
-                return $"+7 ({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6, 2)}-{digits.Substring(8, 2)}";
-            }
-
-            return phone;
+            return PhoneNumberHelper.FormatPhoneNumber(phone);
         }
 
         private void TxtPhone_TextChanged(object sender, TextChangedEventArgs e)
@@ -56,13 +51,34 @@ namespace VetClinic.Dialogs
                 string text = txtPhone.Text;
                 int caretIndex = txtPhone.CaretIndex;
 
-                string formatted = FormatPhoneNumber(text);
+                // Форматируем текст
+                string formatted = PhoneNumberHelper.FormatPhoneNumber(text);
 
                 if (formatted != text)
                 {
                     txtPhone.Text = formatted;
+                    // Пытаемся сохранить позицию курсора
                     txtPhone.CaretIndex = caretIndex + (formatted.Length - text.Length);
                 }
+            }
+        }
+
+        private void TxtPhone_GotFocus(object sender, RoutedEventArgs e)
+        {
+            // Если стоит пример, очищаем при фокусе
+            if (txtPhone.Text == "+7 (___) ___-__-__")
+            {
+                txtPhone.Text = "+7 (";
+                txtPhone.CaretIndex = 4;
+            }
+        }
+
+        private void TxtPhone_LostFocus(object sender, RoutedEventArgs e)
+        {
+            // Если поле пустое, ставим пример
+            if (string.IsNullOrWhiteSpace(txtPhone.Text) || txtPhone.Text == "+7 (")
+            {
+                Phone = "+7 (___) ___-__-__";
             }
         }
 
@@ -91,14 +107,10 @@ namespace VetClinic.Dialogs
                         break;
 
                     case nameof(Phone):
-                        if (string.IsNullOrWhiteSpace(Phone))
+                        if (string.IsNullOrWhiteSpace(Phone) || Phone == "+7 (___) ___-__-__")
                             error = "Телефон обязателен";
-                        else
-                        {
-                            string digits = Regex.Replace(Phone, @"[^\d]", "");
-                            if (digits.Length < 10 || digits.Length > 15)
-                                error = "Введите корректный номер телефона (10-15 цифр)";
-                        }
+                        else if (!PhoneNumberHelper.IsValidPhoneNumber(Phone))
+                            error = "Введите корректный номер телефона (10 или 11 цифр)";
                         break;
 
                     case nameof(Email):
@@ -136,7 +148,7 @@ namespace VetClinic.Dialogs
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Принудительно обновляем привязки для срабатывания валидации
+            // Принудительно обновляем привязки
             txtLastName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtFirstName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtPhone.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
@@ -155,8 +167,8 @@ namespace VetClinic.Dialogs
                 return;
             }
 
-            // Форматируем телефон перед сохранением
-            Phone = FormatPhoneNumber(Phone);
+            // Нормализуем телефон перед сохранением (59 проблема)
+            Phone = PhoneNumberHelper.NormalizePhoneNumber(Phone);
 
             DialogResult = true;
             Close();

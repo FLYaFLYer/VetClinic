@@ -13,6 +13,7 @@ namespace VetClinic.Pages
     public partial class PatientsPage : Page
     {
         private readonly VeterContext _context = new VeterContext();
+        private bool _isSearching = false;
 
         public PatientsPage()
         {
@@ -34,6 +35,8 @@ namespace VetClinic.Pages
 
         private void LoadData()
         {
+            _isSearching = false;
+
             _context.Patients
                 .Include(p => p.Owner)
                 .Include(p => p.AnimalType)
@@ -41,6 +44,28 @@ namespace VetClinic.Pages
                 .Load();
 
             dataGrid.ItemsSource = _context.Patients.Local;
+        }
+
+        // Поиск по кличке (50 проблема)
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = txtSearch.Text.Trim().ToLower();
+
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                LoadData();
+                return;
+            }
+
+            _isSearching = true;
+
+            // Фильтрация локальных данных
+            var filteredPatients = _context.Patients.Local
+                .Where(p => p.Name.ToLower().Contains(searchText))
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            dataGrid.ItemsSource = filteredPatients;
         }
 
         private void BtnAddPatient_Click(object sender, RoutedEventArgs e)
@@ -124,7 +149,14 @@ namespace VetClinic.Pages
                         editContext.SaveChanges();
 
                         // Обновляем данные в основном контексте
-                        LoadData();
+                        if (_isSearching)
+                        {
+                            TxtSearch_TextChanged(null, null);
+                        }
+                        else
+                        {
+                            LoadData();
+                        }
 
                         MessageBox.Show("Данные пациента успешно обновлены",
                             "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -214,7 +246,15 @@ namespace VetClinic.Pages
                     {
                         _context.Patients.Remove(patientToDelete);
                         _context.SaveChanges();
-                        LoadData();
+
+                        if (_isSearching)
+                        {
+                            TxtSearch_TextChanged(null, null);
+                        }
+                        else
+                        {
+                            LoadData();
+                        }
 
                         MessageBox.Show("Пациент успешно удален",
                             "Успех", MessageBoxButton.OK, MessageBoxImage.Information);

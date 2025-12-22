@@ -238,6 +238,7 @@
     <Compile Include="Utils\AccessManager.cs" />
     <Compile Include="Utils\ExcelExporter.cs" />
     <Compile Include="Utils\NotificationHelper.cs" />
+    <Compile Include="Utils\PhoneNumberHelper.cs" />
     <Compile Include="Utils\SecurityHelper.cs" />
     <Compile Include="visits.cs">
       <DependentUpon>MainDB.tt</DependentUpon>

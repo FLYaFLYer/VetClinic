@@ -23,20 +23,26 @@
         <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
         <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
 
-        <!-- ИСПРАВЛЕННЫЙ ШАБЛОН ДЛЯ ОШИБОК ВАЛИДАЦИИ -->
+        <!-- ИСПРАВЛЕННЫЙ ШАБЛОН ДЛЯ ОШИБОК ВАЛИДАЦИИ (57 проблема) -->
         <ControlTemplate x:Key="ValidationErrorTemplate">
-            <DockPanel LastChildFill="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <AdornedElementPlaceholder Grid.Column="0"/>
+
                 <Border 
+                    Grid.Column="1"
                     Background="Red"
                     CornerRadius="10"
                     Width="20"
                     Height="20"
                     Margin="5,0,0,0"
-                    DockPanel.Dock="Right"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
-                    ToolTipService.InitialShowDelay="0"
-                    ToolTipService.ShowDuration="60000">
+                    ToolTipService.InitialShowDelay="0">
 
                     <TextBlock 
                         Text="!"
@@ -67,8 +73,7 @@
                         </TextBlock.ToolTip>
                     </TextBlock>
                 </Border>
-                <AdornedElementPlaceholder/>
-            </DockPanel>
+            </Grid>
         </ControlTemplate>
 
         <!-- УЛУЧШЕННЫЕ СТИЛИ ДЛЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ -->

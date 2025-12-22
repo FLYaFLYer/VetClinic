@@ -41,7 +41,8 @@ namespace VetClinic.Pages
             if (filterDate.HasValue)
             {
                 var date = filterDate.Value.Date;
-                query = query.Where(v => DbFunctions.TruncateTime(v.VisitDate) == date)
+                // Исправлено (45 проблема) - правильная фильтрация по дате
+                query = query.Where(v => System.Data.Entity.DbFunctions.TruncateTime(v.VisitDate) == date)
                     .OrderByDescending(v => v.VisitDate);
             }
 
@@ -103,6 +104,7 @@ namespace VetClinic.Pages
         {
             if (dpFilterDate.SelectedDate.HasValue)
             {
+                // Исправлено (45 проблема) - фильтрация по выбранной дате
                 LoadData(dpFilterDate.SelectedDate.Value);
             }
             else

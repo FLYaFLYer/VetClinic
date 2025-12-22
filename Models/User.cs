@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 
 namespace VetClinic.Models
 {
@@ -166,7 +165,6 @@ namespace VetClinic.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // Реализация IDataErrorInfo для валидации
         public string Error => null;
 
         public string this[string columnName]
@@ -182,6 +180,8 @@ namespace VetClinic.Models
                             error = "Логин обязателен";
                         else if (Login.Length > 50)
                             error = "Логин не должен превышать 50 символов";
+                        else if (!System.Text.RegularExpressions.Regex.IsMatch(Login, @"^[a-zA-Z0-9_]+$"))
+                            error = "Логин может содержать только буквы, цифры и подчеркивания";
                         break;
 
                     case nameof(LastName):
@@ -203,9 +203,9 @@ namespace VetClinic.Models
                             error = "Телефон обязателен";
                         else
                         {
-                            string digits = Regex.Replace(PhoneNumber, @"[^\d]", "");
-                            if (digits.Length < 10 || digits.Length > 11)
-                                error = "Введите корректный номер телефона (10 или 11 цифр)";
+                            string digits = System.Text.RegularExpressions.Regex.Replace(PhoneNumber, @"[^\d]", "");
+                            if (digits.Length < 10 || digits.Length > 15)
+                                error = "Введите корректный номер телефона (10-15 цифр)";
                         }
                         break;
 

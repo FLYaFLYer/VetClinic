@@ -5,7 +5,6 @@ using System;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -41,7 +40,7 @@ namespace VetClinic.Dialogs
                 LastName = user.LastName;
                 FirstName = user.FirstName;
                 MiddleName = user.MiddleName;
-                PhoneNumber = FormatPhoneNumber(user.PhoneNumber);
+                PhoneNumber = PhoneNumberHelper.FormatPhoneNumber(user.PhoneNumber);
                 DateOfBirth = user.DateOfBirth;
                 DateOfHire = user.DateOfHire;
                 RoleId = user.RoleId;
@@ -62,36 +61,16 @@ namespace VetClinic.Dialogs
                 LastName = "";
                 FirstName = "";
                 MiddleName = "";
-                PhoneNumber = "";
+                PhoneNumber = "+7 (___) ___-__-__";
                 DateOfBirth = EditedUser.DateOfBirth;
                 DateOfHire = EditedUser.DateOfHire;
                 RoleId = EditedUser.RoleId;
             }
 
             DataContext = this;
-        }
 
-        private string FormatPhoneNumber(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return phone;
-
-            string digits = Regex.Replace(phone, @"[^\d]", "");
-
-            if (digits.Length == 11 && digits.StartsWith("7"))
-            {
-                return $"+7 ({digits.Substring(1, 3)}) {digits.Substring(4, 3)}-{digits.Substring(7, 2)}-{digits.Substring(9, 2)}";
-            }
-            else if (digits.Length == 10)
-            {
-                return $"+7 ({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6, 2)}-{digits.Substring(8, 2)}";
-            }
-            else if (digits.Length == 11 && digits.StartsWith("8"))
-            {
-                return $"+7 ({digits.Substring(1, 3)}) {digits.Substring(4, 3)}-{digits.Substring(7, 2)}-{digits.Substring(9, 2)}";
-            }
-
-            return phone;
+            txtPhoneNumber.GotFocus += TxtPhoneNumber_GotFocus;
+            txtPhoneNumber.LostFocus += TxtPhoneNumber_LostFocus;
         }
 
         private void TxtPhoneNumber_TextChanged(object sender, TextChangedEventArgs e)
@@ -101,13 +80,30 @@ namespace VetClinic.Dialogs
                 string text = txtPhoneNumber.Text;
                 int caretIndex = txtPhoneNumber.CaretIndex;
 
-                string formatted = FormatPhoneNumber(text);
+                string formatted = PhoneNumberHelper.FormatPhoneNumber(text);
 
                 if (formatted != text)
                 {
                     txtPhoneNumber.Text = formatted;
                     txtPhoneNumber.CaretIndex = caretIndex + (formatted.Length - text.Length);
                 }
+            }
+        }
+
+        private void TxtPhoneNumber_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (txtPhoneNumber.Text == "+7 (___) ___-__-__")
+            {
+                txtPhoneNumber.Text = "+7 (";
+                txtPhoneNumber.CaretIndex = 4;
+            }
+        }
+
+        private void TxtPhoneNumber_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtPhoneNumber.Text) || txtPhoneNumber.Text == "+7 (")
+            {
+                PhoneNumber = "+7 (___) ___-__-__";
             }
         }
 
@@ -126,7 +122,7 @@ namespace VetClinic.Dialogs
                             error = "Логин обязателен";
                         else if (Login.Length > 50)
                             error = "Логин не должен превышать 50 символов";
-                        else if (!Regex.IsMatch(Login, @"^[a-zA-Z0-9_]+$"))
+                        else if (!System.Text.RegularExpressions.Regex.IsMatch(Login, @"^[a-zA-Z0-9_]+$"))
                             error = "Логин может содержать только буквы, цифры и подчеркивания";
                         break;
 
@@ -150,14 +146,10 @@ namespace VetClinic.Dialogs
                         break;
 
                     case nameof(PhoneNumber):
-                        if (string.IsNullOrWhiteSpace(PhoneNumber))
+                        if (string.IsNullOrWhiteSpace(PhoneNumber) || PhoneNumber == "+7 (___) ___-__-__")
                             error = "Телефон обязателен";
-                        else
-                        {
-                            string digits = Regex.Replace(PhoneNumber, @"[^\d]", "");
-                            if (digits.Length < 10 || digits.Length > 15)
-                                error = "Введите корректный номер телефона (10-15 цифр)";
-                        }
+                        else if (!PhoneNumberHelper.IsValidPhoneNumber(PhoneNumber))
+                            error = "Введите корректный номер телефона (10 или 11 цифр)";
                         break;
 
                     case nameof(DateOfBirth):
@@ -235,7 +227,6 @@ namespace VetClinic.Dialogs
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Принудительно обновляем привязки
             txtLogin.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtLastName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             txtFirstName.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
@@ -244,7 +235,6 @@ namespace VetClinic.Dialogs
             dpDateOfHire.GetBindingExpression(DatePicker.SelectedDateProperty)?.UpdateSource();
             cmbRoles.GetBindingExpression(ComboBox.SelectedValueProperty)?.UpdateSource();
 
-            // Проверяем ошибки валидации
             if (Validation.GetHasError(txtLogin) ||
                 Validation.GetHasError(txtLastName) ||
                 Validation.GetHasError(txtFirstName) ||
@@ -272,7 +262,7 @@ namespace VetClinic.Dialogs
                 EditedUser.LastName = LastName;
                 EditedUser.FirstName = FirstName;
                 EditedUser.MiddleName = MiddleName;
-                EditedUser.PhoneNumber = FormatPhoneNumber(PhoneNumber);
+                EditedUser.PhoneNumber = PhoneNumberHelper.NormalizePhoneNumber(PhoneNumber);
                 EditedUser.DateOfBirth = DateOfBirth.Value;
                 EditedUser.DateOfHire = DateOfHire.Value;
                 EditedUser.RoleId = RoleId.Value;
