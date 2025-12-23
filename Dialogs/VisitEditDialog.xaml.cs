@@ -22,7 +22,7 @@ namespace VetClinic.Dialogs
 
         public List<string> Statuses { get; set; } = new List<string>
         {
-            "Запланирован", "В процессе", "Завершён", "Отменён", "Перенесён"
+            "Запланирован", "В процессе", "Завершён", "Отменён"
         };
 
         private readonly VeterContext _context = new VeterContext();
@@ -41,6 +41,17 @@ namespace VetClinic.Dialogs
                 Temperature = visit.Temperature?.ToString();
                 Recommendations = visit.Recommendations;
                 Status = visit.Status;
+
+                if (visit.Status == "Завершён" || visit.Status == "Отменён")
+                {
+                    cmbStatus.IsEnabled = false;
+                    txtDiagnosis.IsReadOnly = true;
+                    txtTemperature.IsReadOnly = true;
+                    txtRecommendations.IsReadOnly = true;
+                    txtSymptoms.IsReadOnly = true;
+                    cmbPatients.IsEnabled = false;
+                    btnSave.Content = "Закрыть";
+                }
             }
 
             DataContext = this;
@@ -59,13 +70,11 @@ namespace VetClinic.Dialogs
 
         private void TxtTemperature_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            // Разрешаем только цифры, точку и запятую
             if (!char.IsDigit(e.Text, 0) && e.Text != "." && e.Text != ",")
             {
                 e.Handled = true;
             }
 
-            // Проверяем, чтобы точка или запятая была только одна
             string currentText = txtTemperature.Text + e.Text;
             if ((e.Text == "." || e.Text == ",") &&
                 (currentText.Count(c => c == '.' || c == ',') > 1))
@@ -101,8 +110,8 @@ namespace VetClinic.Dialogs
                         {
                             if (decimal.TryParse(Temperature.Replace(',', '.'), out decimal tempValue))
                             {
-                                if (tempValue < 30 || tempValue > 45)
-                                    error = "Температура должна быть между 30 и 45 градусами";
+                                if (tempValue < 20 || tempValue > 50)
+                                    error = "Температура должна быть между 20 и 50 градусами";
                             }
                             else
                             {
@@ -135,15 +144,34 @@ namespace VetClinic.Dialogs
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Принудительно обновляем привязки
+            if (btnSave.Content.ToString() == "Закрыть")
+            {
+                DialogResult = false;
+                Close();
+                return;
+            }
+
+            if (Status == "Отменён" || Status == "Завершён")
+            {
+                var result = MessageBox.Show(
+                    $"Вы уверены, что хотите изменить статус приёма на '{Status}'?\n\n" +
+                    "Это действие может быть необратимо. Продолжить?",
+                    "Подтверждение смены статуса",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
+
             txtDiagnosis.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
             txtTemperature.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
 
-            // Обновляем привязки для ComboBox
             cmbPatients.GetBindingExpression(ComboBox.SelectedValueProperty)?.UpdateSource();
             cmbStatus.GetBindingExpression(ComboBox.SelectedItemProperty)?.UpdateSource();
 
-            // Проверяем ошибки валидации
             if (Validation.GetHasError(txtDiagnosis) ||
                 Validation.GetHasError(txtTemperature) ||
                 Validation.GetHasError(cmbPatients) ||

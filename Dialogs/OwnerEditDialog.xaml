@@ -4,7 +4,7 @@
         Title="Редактирование владельца" 
         Height="400" 
         Width="400"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="15">

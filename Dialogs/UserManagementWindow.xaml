@@ -4,7 +4,7 @@
         Title="Управление пользователями" 
         Height="600" 
         Width="900"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         MinHeight="500"
         MinWidth="800">
 

@@ -33,19 +33,37 @@ namespace VetClinic.Pages
             }
         }
 
-        private void LoadData()
+        public void LoadData()
         {
-            _context.Medicines.Load();
-            var medicines = _context.Medicines.Local;
-
-            foreach (var medicine in medicines)
+            try
             {
-                medicine.TotalQuantity = _context.MedicineStocks
-                    .Where(ms => ms.MedicineId == medicine.Id)
-                    .Sum(ms => (int?)ms.Quantity) ?? 0;
-            }
+                // Сбрасываем изменения в контексте
+                _context.ChangeTracker.Entries().ToList().ForEach(entry => entry.State = EntityState.Detached);
 
-            dataGrid.ItemsSource = medicines;
+                // Загружаем данные заново
+                var medicines = _context.Medicines.ToList();
+
+                foreach (var medicine in medicines)
+                {
+                    medicine.TotalQuantity = _context.MedicineStocks
+                        .Where(ms => ms.MedicineId == medicine.Id)
+                        .Sum(ms => (int?)ms.Quantity) ?? 0;
+                }
+
+                // Очищаем и обновляем DataGrid
+                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = medicines;
+                dataGrid.Items.Refresh();
+
+                // Обновляем статус
+                int lowStockCount = medicines.Count(m => m.TotalQuantity < m.MinStock);
+                tbStatus.Text = $"Лекарств: {medicines.Count}, с низким запасом: {lowStockCount}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnAddMedicine_Click(object sender, RoutedEventArgs e)
@@ -73,7 +91,11 @@ namespace VetClinic.Pages
 
                     _context.Medicines.Add(newMedicine);
                     _context.SaveChanges();
+
                     LoadData();
+
+                    MessageBox.Show("Лекарство успешно добавлено", "Успех",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (System.Data.Entity.Validation.DbEntityValidationException ex)
                 {
@@ -124,15 +146,27 @@ namespace VetClinic.Pages
             {
                 try
                 {
-                    medicine.Name = dialog.MedicineName;
-                    medicine.Category = dialog.Category;
-                    medicine.Price = dialog.Price;
-                    medicine.Unit = dialog.Unit;
-                    medicine.Description = dialog.Description;
-                    medicine.MinStock = dialog.MinStock;
+                    // Создаем новый контекст для редактирования
+                    using (var editContext = new VeterContext())
+                    {
+                        var medicineToUpdate = editContext.Medicines.Find(medicine.Id);
+                        if (medicineToUpdate != null)
+                        {
+                            medicineToUpdate.Name = dialog.MedicineName;
+                            medicineToUpdate.Category = dialog.Category;
+                            medicineToUpdate.Price = dialog.Price;
+                            medicineToUpdate.Unit = dialog.Unit;
+                            medicineToUpdate.Description = dialog.Description;
+                            medicineToUpdate.MinStock = dialog.MinStock;
 
-                    _context.SaveChanges();
+                            editContext.SaveChanges();
+                        }
+                    }
+
                     LoadData();
+
+                    MessageBox.Show("Лекарство успешно обновлено", "Успех",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (System.Data.Entity.Validation.DbEntityValidationException ex)
                 {
@@ -186,9 +220,50 @@ namespace VetClinic.Pages
 
             if (result == MessageBoxResult.Yes)
             {
-                _context.Medicines.Remove(medicine);
-                _context.SaveChanges();
-                LoadData();
+                try
+                {
+                    // Используем отдельный контекст для проверки
+                    using (var checkContext = new VeterContext())
+                    {
+                        bool hasStocks = checkContext.MedicineStocks.Any(ms => ms.MedicineId == medicine.Id);
+                        bool hasPrescriptions = checkContext.Prescriptions.Any(p => p.MedicineId == medicine.Id);
+                        bool hasNotifications = checkContext.Notifications.Any(n => n.MedicineId == medicine.Id);
+
+                        if (hasStocks || hasPrescriptions || hasNotifications)
+                        {
+                            string message = "Нельзя удалить лекарство, которое:\n";
+                            if (hasStocks) message += "• Есть на складе\n";
+                            if (hasPrescriptions) message += "• Назначено пациентам\n";
+                            if (hasNotifications) message += "• Есть связанные уведомления\n";
+                            message += "\nСначала удалите все связанные записи.";
+
+                            MessageBox.Show(message,
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    // Используем отдельный контекст для удаления
+                    using (var deleteContext = new VeterContext())
+                    {
+                        var medicineToDelete = deleteContext.Medicines.Find(medicine.Id);
+                        if (medicineToDelete != null)
+                        {
+                            deleteContext.Medicines.Remove(medicineToDelete);
+                            deleteContext.SaveChanges();
+                        }
+                    }
+
+                    LoadData();
+
+                    MessageBox.Show("Лекарство успешно удалено", "Успех",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при удалении: {ex.Message}",
+                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -234,6 +309,19 @@ namespace VetClinic.Pages
             {
                 LoadData();
             }
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadData();
+            MessageBox.Show("Данные обновлены", "Обновление",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            AutoRefreshHelper.StopAutoRefresh();
+            _context?.Dispose();
         }
     }
 }

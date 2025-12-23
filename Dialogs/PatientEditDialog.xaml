@@ -4,7 +4,7 @@
         Title="Редактирование пациента" 
         Height="550" 
         Width="500"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
 
     <Grid>

@@ -13,7 +13,7 @@ namespace VetClinic.Models
 
         [ForeignKey("Medicine")]
         [Column("medicine_id")]
-        public int MedicineId { get; set; }
+        public int? MedicineId { get; set; }
 
         [Required]
         [StringLength(500)]
@@ -23,7 +23,7 @@ namespace VetClinic.Models
         [Column("created_date")]
         public DateTime CreatedDate { get; set; }
 
-        [Column("is_read")]
+        [NotMapped]
         public bool IsRead { get; set; }
 
         public virtual Medicine Medicine { get; set; }

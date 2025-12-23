@@ -1,5 +1,6 @@
 ﻿using VetClinic.Data;
 using VetClinic.Models;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
@@ -20,55 +21,199 @@ namespace VetClinic.Dialogs
         {
             try
             {
-                _context.Notifications
+                // Загружаем все уведомления
+                var notifications = _context.Notifications
                     .Include(n => n.Medicine)
                     .OrderByDescending(n => n.CreatedDate)
-                    .Load();
+                    .ToList();
 
-                dataGrid.ItemsSource = _context.Notifications.Local;
+                // Получаем прочитанные уведомления для текущего пользователя
+                var readNotifications = _context.UserNotifications
+                    .Where(un => un.UserId == App.CurrentUser.Id && un.IsRead)
+                    .Select(un => un.NotificationId)
+                    .ToList();
+
+                // Помечаем уведомления как прочитанные/непрочитанные
+                foreach (var notification in notifications)
+                {
+                    notification.IsRead = readNotifications.Contains(notification.Id);
+                }
+
+                dataGrid.ItemsSource = notifications;
 
                 // Обновляем счетчик
-                int unreadCount = _context.Notifications.Local.Count(n => !n.IsRead);
-                int totalCount = _context.Notifications.Local.Count;
+                int unreadCount = notifications.Count(n => !n.IsRead);
+                int totalCount = notifications.Count;
 
                 tbNotificationCount.Text = $"Уведомлений: {totalCount} (новых: {unreadCount})";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки уведомлений: {ex.Message}",
+                MessageBox.Show($"Ошибка загрузки уведомлений: {ex.InnerException?.Message ?? ex.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void MarkNotificationAsRead(int notificationId)
+        {
+            try
+            {
+                // Проверяем, есть ли уже запись
+                var userNotification = _context.UserNotifications
+                    .FirstOrDefault(un => un.UserId == App.CurrentUser.Id &&
+                                         un.NotificationId == notificationId);
+
+                if (userNotification != null)
+                {
+                    // Обновляем существующую запись
+                    userNotification.IsRead = true;
+                    userNotification.ReadDate = DateTime.Now;
+                }
+                else
+                {
+                    // Создаем новую запись
+                    userNotification = new UserNotification
+                    {
+                        UserId = App.CurrentUser.Id,
+                        NotificationId = notificationId,
+                        IsRead = true,
+                        ReadDate = DateTime.Now
+                    };
+                    _context.UserNotifications.Add(userNotification);
+                }
+
+                _context.SaveChanges();
+
+                // Обновляем отображение
+                var notification = (dataGrid.ItemsSource as System.Collections.IEnumerable)
+                    .Cast<Notification>()
+                    .FirstOrDefault(n => n.Id == notificationId);
+
+                if (notification != null)
+                {
+                    notification.IsRead = true;
+                    dataGrid.Items.Refresh();
+                }
+
+                // Обновляем счетчик
+                int unreadCount = (dataGrid.ItemsSource as System.Collections.IEnumerable)
+                    .Cast<Notification>()
+                    .Count(n => !n.IsRead);
+                int totalCount = (dataGrid.ItemsSource as System.Collections.IEnumerable)
+                    .Cast<Notification>()
+                    .Count();
+
+                tbNotificationCount.Text = $"Уведомлений: {totalCount} (новых: {unreadCount})";
+
+                // Обновляем счетчик в главном окне
+                if (Application.Current.MainWindow is MainWindow mainWindow)
+                {
+                    mainWindow.LoadNotificationsCount(); // Теперь метод public
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при отметке уведомления: {ex.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void MarkAllNotificationsAsRead()
+        {
+            try
+            {
+                var notifications = (dataGrid.ItemsSource as System.Collections.IEnumerable)
+                    .Cast<Notification>()
+                    .Where(n => !n.IsRead)
+                    .ToList();
+
+                foreach (var notification in notifications)
+                {
+                    var userNotification = _context.UserNotifications
+                        .FirstOrDefault(un => un.UserId == App.CurrentUser.Id &&
+                                             un.NotificationId == notification.Id);
+
+                    if (userNotification != null)
+                    {
+                        userNotification.IsRead = true;
+                        userNotification.ReadDate = DateTime.Now;
+                    }
+                    else
+                    {
+                        userNotification = new UserNotification
+                        {
+                            UserId = App.CurrentUser.Id,
+                            NotificationId = notification.Id,
+                            IsRead = true,
+                            ReadDate = DateTime.Now
+                        };
+                        _context.UserNotifications.Add(userNotification);
+                    }
+                }
+
+                _context.SaveChanges();
+
+                // Обновляем отображение
+                foreach (var notification in notifications)
+                {
+                    notification.IsRead = true;
+                }
+                dataGrid.Items.Refresh();
+
+                // Обновляем счетчик
+                tbNotificationCount.Text = $"Уведомлений: {notifications.Count} (новых: 0)";
+
+                // Обновляем счетчик в главном окне
+                if (Application.Current.MainWindow is MainWindow mainWindow)
+                {
+                    mainWindow.LoadNotificationsCount(); // Теперь метод public
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при отметке всех уведомлений: {ex.Message}",
                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void BtnMarkAsRead_Click(object sender, RoutedEventArgs e)
         {
-            var unreadNotifications = _context.Notifications.Local.Where(n => !n.IsRead).ToList();
+            MarkAllNotificationsAsRead();
+            MessageBox.Show("Все уведомления отмечены как прочитанные",
+                "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
 
-            if (unreadNotifications.Count == 0)
+        private void BtnMarkSelectedAsRead_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid.SelectedItem is Notification selectedNotification)
             {
-                MessageBox.Show("Нет непрочитанных уведомлений",
-                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var result = MessageBox.Show(
-                $"Пометить все {unreadNotifications.Count} непрочитанных уведомлений как прочитанные?",
-                "Подтверждение",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                foreach (var notification in unreadNotifications)
+                if (!selectedNotification.IsRead)
                 {
-                    notification.IsRead = true;
+                    MarkNotificationAsRead(selectedNotification.Id);
+                    MessageBox.Show("Уведомление отмечено как прочитанное",
+                        "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+                else
+                {
+                    MessageBox.Show("Уведомление уже прочитано",
+                        "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите уведомление",
+                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
 
-                _context.SaveChanges();
-                LoadNotifications();
-
-                MessageBox.Show("Все уведомления помечены как прочитанные",
-                    "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (dataGrid.SelectedItem is Notification selectedNotification)
+            {
+                if (!selectedNotification.IsRead)
+                {
+                    MarkNotificationAsRead(selectedNotification.Id);
+                }
             }
         }
 
@@ -82,7 +227,7 @@ namespace VetClinic.Dialogs
             Close();
         }
 
-        protected override void OnClosed(System.EventArgs e)
+        protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             _context?.Dispose();

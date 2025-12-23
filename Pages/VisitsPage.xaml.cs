@@ -14,6 +14,7 @@ namespace VetClinic.Pages
     public partial class VisitsPage : Page
     {
         private readonly VeterContext _context = new VeterContext();
+        private DateTime? _currentFilterDate = null;
 
         public VisitsPage()
         {
@@ -31,45 +32,43 @@ namespace VetClinic.Pages
             }
         }
 
-        private void LoadData(DateTime? filterDate = null)
+        // ИЗМЕНЕНИЕ: Изменил private на public для доступа из MainWindow
+        public void LoadData(DateTime? filterDate = null)
         {
             try
             {
-                List<Visit> visits;
+                _currentFilterDate = filterDate;
+
+                IQueryable<Visit> query = _context.Visits
+                    .Include(v => v.Patient)
+                    .Include(v => v.Patient.Owner)
+                    .Include(v => v.User);
 
                 if (filterDate.HasValue)
                 {
-                    // Способ 1: Загружаем все данные и фильтруем в памяти
-                    var allVisits = _context.Visits
-                        .Include(v => v.Patient)
-                        .Include(v => v.Patient.Owner)
-                        .Include(v => v.User)
-                        .ToList();
-
                     var targetDate = filterDate.Value.Date;
-                    visits = allVisits
-                        .Where(v => v.VisitDate.Date == targetDate)
-                        .OrderByDescending(v => v.VisitDate)
-                        .ToList();
+                    var nextDay = targetDate.AddDays(1);
+                    query = query.Where(v => v.VisitDate >= targetDate && v.VisitDate < nextDay);
                 }
-                else
-                {
-                    // Без фильтра
-                    visits = _context.Visits
-                        .Include(v => v.Patient)
-                        .Include(v => v.Patient.Owner)
-                        .Include(v => v.User)
-                        .OrderByDescending(v => v.VisitDate)
-                        .ToList();
-                }
+
+                var visits = query
+                    .OrderByDescending(v => v.VisitDate)
+                    .ToList();
 
                 dataGrid.ItemsSource = visits;
+                tbStatus.Text = $"Загружено приёмов: {visits.Count}";
+
+                // Автоматически обновляем счетчик уведомлений
+                if (Application.Current.MainWindow is MainWindow mainWindow)
+                {
+                    mainWindow.LoadNotificationsCount();
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = new List<Visit>();
             }
         }
 
@@ -84,7 +83,33 @@ namespace VetClinic.Pages
             var dialog = new VisitEditDialog();
             if (dialog.ShowDialog() == true)
             {
-                LoadData(dpFilterDate.SelectedDate);
+                try
+                {
+                    var newVisit = new Visit
+                    {
+                        PatientId = dialog.PatientId,
+                        UserId = App.CurrentUser.Id,
+                        VisitDate = DateTime.Now,
+                        Diagnosis = dialog.Diagnosis,
+                        Symptoms = dialog.Symptoms,
+                        Temperature = !string.IsNullOrWhiteSpace(dialog.Temperature) ?
+                            decimal.Parse(dialog.Temperature.Replace(',', '.')) : (decimal?)null,
+                        Recommendations = dialog.Recommendations,
+                        Status = dialog.Status
+                    };
+
+                    _context.Visits.Add(newVisit);
+                    _context.SaveChanges();
+
+                    LoadData(_currentFilterDate);
+                    MessageBox.Show("Приём успешно добавлен", "Успех",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при добавлении приёма: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -103,10 +128,42 @@ namespace VetClinic.Pages
             }
 
             var visit = (Visit)dataGrid.SelectedItem;
+
+            // Проверяем, можно ли редактировать приём
+            if (!visit.CanBeEdited)
+            {
+                MessageBox.Show("Нельзя редактировать завершённые или отменённые приёмы",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var dialog = new VisitEditDialog(visit);
             if (dialog.ShowDialog() == true)
             {
-                LoadData(dpFilterDate.SelectedDate);
+                try
+                {
+                    var visitToUpdate = _context.Visits.Find(visit.Id);
+                    if (visitToUpdate != null)
+                    {
+                        visitToUpdate.Diagnosis = dialog.Diagnosis;
+                        visitToUpdate.Symptoms = dialog.Symptoms;
+                        visitToUpdate.Temperature = !string.IsNullOrWhiteSpace(dialog.Temperature) ?
+                            decimal.Parse(dialog.Temperature.Replace(',', '.')) : (decimal?)null;
+                        visitToUpdate.Recommendations = dialog.Recommendations;
+                        visitToUpdate.Status = dialog.Status;
+                        visitToUpdate.NextVisitDate = null;
+
+                        _context.SaveChanges();
+                        LoadData(_currentFilterDate);
+                        MessageBox.Show("Приём успешно обновлён", "Успех",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при обновлении приёма: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -134,9 +191,16 @@ namespace VetClinic.Pages
             LoadData();
         }
 
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadData(_currentFilterDate);
+            MessageBox.Show("Данные обновлены", "Обновление",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             _context?.Dispose();
         }
     }
-}   
+}

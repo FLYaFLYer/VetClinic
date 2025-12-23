@@ -65,6 +65,9 @@ namespace VetClinic.Dialogs
                 DateOfBirth = EditedUser.DateOfBirth;
                 DateOfHire = EditedUser.DateOfHire;
                 RoleId = EditedUser.RoleId;
+
+                // Проверяем уникальность логина для нового пользователя
+                txtLogin.IsEnabled = true;
             }
 
             DataContext = this;
@@ -124,6 +127,17 @@ namespace VetClinic.Dialogs
                             error = "Логин не должен превышать 50 символов";
                         else if (!System.Text.RegularExpressions.Regex.IsMatch(Login, @"^[a-zA-Z0-9_]+$"))
                             error = "Логин может содержать только буквы, цифры и подчеркивания";
+                        else if (EditedUser.Id == 0) // Проверка уникальности только для нового пользователя
+                        {
+                            using (var checkContext = new VeterContext())
+                            {
+                                bool loginExists = checkContext.Users.Any(u => u.Login == Login);
+                                if (loginExists)
+                                {
+                                    error = $"Пользователь с логином '{Login}' уже существует";
+                                }
+                            }
+                        }
                         break;
 
                     case nameof(LastName):
@@ -188,9 +202,6 @@ namespace VetClinic.Dialogs
 
             pwdPassword.Password = PasswordPlainText;
             txtPasswordVisible.Text = PasswordPlainText;
-
-            MessageBox.Show($"Пароль пользователя: {randomPassword}\n\nСкопируйте его для передачи пользователю!",
-                          "Пароль сгенерирован", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void PwdPassword_PasswordChanged(object sender, RoutedEventArgs e)
@@ -267,31 +278,15 @@ namespace VetClinic.Dialogs
                 EditedUser.DateOfHire = DateOfHire.Value;
                 EditedUser.RoleId = RoleId.Value;
 
-                if (EditedUser.Id == 0)
+                // Если пароль не был установлен (для существующего пользователя)
+                if (EditedUser.Id != 0 && string.IsNullOrEmpty(PasswordPlainText))
                 {
-                    _context.Users.Add(EditedUser);
+                    // Не меняем пароль
                 }
-                else
+                else if (!string.IsNullOrEmpty(PasswordPlainText))
                 {
-                    var existingUser = _context.Users.Find(EditedUser.Id);
-                    if (existingUser != null)
-                    {
-                        existingUser.LastName = EditedUser.LastName;
-                        existingUser.FirstName = EditedUser.FirstName;
-                        existingUser.MiddleName = EditedUser.MiddleName;
-                        existingUser.PhoneNumber = EditedUser.PhoneNumber;
-                        existingUser.DateOfBirth = EditedUser.DateOfBirth;
-                        existingUser.DateOfHire = EditedUser.DateOfHire;
-                        existingUser.RoleId = EditedUser.RoleId;
-
-                        if (!string.IsNullOrEmpty(PasswordPlainText))
-                        {
-                            existingUser.Password = EditedUser.Password;
-                        }
-                    }
+                    EditedUser.Password = SecurityHelper.HashPassword(PasswordPlainText);
                 }
-
-                _context.SaveChanges();
 
                 DialogResult = true;
                 Close();
@@ -320,7 +315,7 @@ namespace VetClinic.Dialogs
             {
                 try
                 {
-                    Clipboard.SetText(PasswordPlainText);
+                    System.Windows.Clipboard.SetText(PasswordPlainText);
                     MessageBox.Show("Пароль скопирован в буфер обмена", "Успешно",
                                   MessageBoxButton.OK, MessageBoxImage.Information);
                 }

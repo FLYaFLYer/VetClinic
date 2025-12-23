@@ -8,7 +8,7 @@
         Background="White">
 
     <Window.Resources>
-        <!-- Стиль для кнопки уведомлений -->
+        <!-- Стиль для кнопки уведомлений с бейджем -->
         <Style TargetType="Button" x:Key="NotificationButtonStyle">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="White"/>
@@ -30,10 +30,10 @@
                                     Height="20"
                                     VerticalAlignment="Top"
                                     HorizontalAlignment="Right"
-                                    Margin="2,-2,0,0"
+                                    Margin="0,-5,0,0"
                                     Visibility="Collapsed">
                                 <TextBlock x:Name="badgeText"
-                                           Text="0"
+                                           Text="{Binding UnreadCount}"
                                            Foreground="White"
                                            FontSize="10"
                                            FontWeight="Bold"
@@ -48,6 +48,9 @@
                             <DataTrigger Binding="{Binding UnreadCount}" Value="{x:Null}">
                                 <Setter TargetName="badge" Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -83,12 +86,28 @@
                             Orientation="Horizontal" 
                             Margin="0,0,20,0"
                             VerticalAlignment="Center">
+                    <!-- Кнопка автообновления -->
+                    <Button x:Name="btnAutoRefresh" 
+                            Content="🔄"
+                            Width="40"
+                            Height="40"
+                            Margin="0,0,10,0"
+                            Click="BtnAutoRefresh_Click"
+                            ToolTip="Включить/выключить автообновление (30 сек)"
+                            Style="{StaticResource NavButtonStyle}"/>
+
+                    <!-- Кнопка уведомлений -->
                     <Button x:Name="btnNotifications" 
                             Style="{StaticResource NotificationButtonStyle}"
                             Margin="0,0,20,0"
+                            Width="40"
+                            Height="40"
                             Click="BtnNotifications_Click"
-                            ToolTip="Уведомления"
-                            DataContext="{Binding}"/>
+                            ToolTip="{Binding UnreadCount, StringFormat='Уведомлений: {0} непрочитанных'}">
+                        <Button.DataContext>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="DataContext"/>
+                        </Button.DataContext>
+                    </Button>
 
                     <Button x:Name="btnLogout" 
                             Content="Выход" 

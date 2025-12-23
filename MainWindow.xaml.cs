@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using VetClinic.Data;
 using VetClinic.Models;
+using VetClinic.Utils;
 
 namespace VetClinic
 {
@@ -12,7 +14,7 @@ namespace VetClinic
     {
         private Button _currentNavButton;
         private int _unreadCount;
-        private readonly VeterContext _context = new VeterContext();
+        private readonly System.Threading.Timer _notificationTimer;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -34,6 +36,13 @@ namespace VetClinic
             SetupNavigationBasedOnRole();
             LoadNotificationsCount();
 
+            // Запускаем таймер для обновления уведомлений каждые 10 секунд
+            _notificationTimer = new System.Threading.Timer(
+                _ => UpdateNotifications(),
+                null,
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(10));
+
             // Устанавливаем первую вкладку как активную
             SetActiveNavButton(btnPatients);
             MainFrame.Navigate(new Pages.PatientsPage());
@@ -47,11 +56,41 @@ namespace VetClinic
             }
         }
 
-        private void LoadNotificationsCount()
+        private void UpdateNotifications()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                LoadNotificationsCount();
+            });
+        }
+
+        // ИЗМЕНЕНИЕ: Сделать метод public вместо private
+        public void LoadNotificationsCount()
         {
             try
             {
-                UnreadCount = _context.Notifications.Count(n => !n.IsRead);
+                using (var context = new VeterContext())
+                {
+                    // Получаем ID всех уведомлений
+                    var allNotificationIds = context.Notifications
+                        .Select(n => n.Id)
+                        .ToList();
+
+                    // Получаем ID прочитанных уведомлений для текущего пользователя
+                    var readNotificationIds = context.UserNotifications
+                        .Where(un => un.UserId == App.CurrentUser.Id && un.IsRead)
+                        .Select(un => un.NotificationId)
+                        .ToList();
+
+                    // Считаем непрочитанные уведомления
+                    int unreadCount = allNotificationIds.Count(id => !readNotificationIds.Contains(id));
+
+                    UnreadCount = unreadCount;
+
+                    btnNotifications.ToolTip = UnreadCount > 0
+                        ? $"Уведомлений: {UnreadCount} непрочитанных"
+                        : "Нет новых уведомлений";
+                }
             }
             catch (Exception ex)
             {
@@ -133,12 +172,17 @@ namespace VetClinic
         private void BtnNotifications_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Dialogs.NotificationsDialog();
-            dialog.Closed += (s, args) => LoadNotificationsCount();
+            dialog.Owner = this;
+            dialog.Closed += (s, args) =>
+            {
+                LoadNotificationsCount(); // Обновляем счетчик после закрытия окна
+            };
             dialog.ShowDialog();
         }
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
         {
+            _notificationTimer?.Dispose();
             App.CurrentRole = null;
             App.CurrentUser = null;
 
@@ -147,10 +191,61 @@ namespace VetClinic
             Close();
         }
 
+        private void BtnAutoRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            AutoRefreshHelper.AutoRefreshEnabled = !AutoRefreshHelper.AutoRefreshEnabled;
+
+            if (AutoRefreshHelper.AutoRefreshEnabled)
+            {
+                AutoRefreshHelper.StartAutoRefresh(RefreshCurrentPage);
+                MessageBox.Show("Автообновление включено (30 сек)", "Информация",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                AutoRefreshHelper.StopAutoRefresh();
+                MessageBox.Show("Автообновление выключено", "Информация",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void RefreshCurrentPage()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                // Обновляем текущую страницу
+                var currentPage = MainFrame.Content;
+
+                if (currentPage is Pages.PatientsPage patientsPage)
+                {
+                    patientsPage.LoadData();
+                }
+                else if (currentPage is Pages.MedicinesPage medicinesPage)
+                {
+                    medicinesPage.LoadData();
+                }
+                else if (currentPage is Pages.VisitsPage visitsPage)
+                {
+                    visitsPage.LoadData(null);
+                }
+                else if (currentPage is Pages.OwnersPage ownersPage)
+                {
+                    ownersPage.LoadData();
+                }
+                else if (currentPage is Pages.ReportsPage reportsPage)
+                {
+                    // Для ReportsPage нет метода LoadData, просто обновим
+                    reportsPage = new Pages.ReportsPage();
+                    MainFrame.Navigate(reportsPage);
+                }
+            });
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            _context?.Dispose();
+            _notificationTimer?.Dispose();
+            AutoRefreshHelper.StopAutoRefresh();
         }
     }
 }

@@ -4,7 +4,7 @@
         Title="Редактирование лекарства" 
         Height="500" 
         Width="500"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         MinWidth="500"
         MinHeight="500">

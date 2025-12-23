@@ -34,9 +34,8 @@ namespace VetClinic.Models
         public string Symptoms { get; set; }
 
         [Column("temperature")]
-        [Range(30.0, 45.0, ErrorMessage = "Температура должна быть между 30 и 45 градусами")]
+        [Range(20.0, 50.0, ErrorMessage = "Температура должна быть между 20 и 50 градусами")]
         public decimal? Temperature { get; set; }
-
 
         [Column("recommendations")]
         [StringLength(1000)]
@@ -55,7 +54,6 @@ namespace VetClinic.Models
         [NotMapped]
         public string TemperatureFormatted => Temperature.HasValue ? $"{Temperature.Value:N1}°C" : "Не измерялась";
 
-        // Оставляем для обратной совместимости, но возвращаем вес пациента
         [NotMapped]
         public string WeightFormatted
         {
@@ -76,6 +74,9 @@ namespace VetClinic.Models
 
         [NotMapped]
         public bool CanBeCancelled => Status == "Запланирован" || Status == "В процессе";
+
+        [NotMapped]
+        public bool CanBeEdited => Status == "Запланирован" || Status == "В процессе";
 
         // Реализация IDataErrorInfo
         public string Error => null;
@@ -101,8 +102,8 @@ namespace VetClinic.Models
                         break;
 
                     case nameof(Temperature):
-                        if (Temperature.HasValue && (Temperature < 30 || Temperature > 45))
-                            error = "Температура должна быть между 30 и 45 градусами";
+                        if (Temperature.HasValue && (Temperature < 20 || Temperature > 50))
+                            error = "Температура должна быть между 20 и 50 градусами";
                         break;
 
                     case nameof(Status):

@@ -33,6 +33,7 @@ namespace VetClinic.Data
         public DbSet<Visit> Visits { get; set; }
         public DbSet<Prescription> Prescriptions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -50,6 +51,7 @@ namespace VetClinic.Data
             modelBuilder.Entity<Visit>().ToTable("visits");
             modelBuilder.Entity<Prescription>().ToTable("prescriptions");
             modelBuilder.Entity<Notification>().ToTable("notifications");
+            modelBuilder.Entity<UserNotification>().ToTable("user_notifications");
 
             modelBuilder.Entity<Medicine>()
                 .Property(m => m.Price)

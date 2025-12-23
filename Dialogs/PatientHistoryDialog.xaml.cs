@@ -42,7 +42,7 @@ namespace VetClinic.Dialogs
                         Title = "Диагноз",
                         Width = 400,
                         Height = 300,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
                         Owner = this
                     };
 

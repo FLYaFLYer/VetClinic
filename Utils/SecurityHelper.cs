@@ -17,7 +17,9 @@ namespace VetClinic.Utils
 
         public static bool VerifyPassword(string password, string hashedPassword)
         {
-            return HashPassword(password) == hashedPassword;
+            // Преобразуем введенный пароль в хэш и сравниваем с хэшем в БД без учета регистра
+            var hashedInput = HashPassword(password);
+            return string.Equals(hashedInput, hashedPassword, StringComparison.OrdinalIgnoreCase);
         }
 
         public static string GenerateRandomPassword(int length = 8)

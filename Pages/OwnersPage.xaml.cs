@@ -30,7 +30,8 @@ namespace VetClinic.Pages
             }
         }
 
-        private void LoadData()
+        // Изменяем на public для доступа из MainWindow
+        public void LoadData()
         {
             _context.Owners.Load();
             dataGrid.ItemsSource = _context.Owners.Local;
@@ -59,6 +60,9 @@ namespace VetClinic.Pages
                 _context.Owners.Add(newOwner);
                 _context.SaveChanges();
                 LoadData();
+
+                MessageBox.Show("Владелец успешно добавлен", "Успех",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 

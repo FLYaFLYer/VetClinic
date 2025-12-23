@@ -7,6 +7,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
@@ -21,6 +22,12 @@
                     Style="{StaticResource NavButtonStyle}"
                     Margin="10,0,0,0"
                     Click="BtnViewDetails_Click"/>
+            <Button x:Name="btnRefresh" Content="🔄 Обновить"
+                    Style="{StaticResource NavButtonStyle}"
+                    Margin="10,0,0,0"
+                    Click="BtnRefresh_Click"
+                    ToolTip="Обновить данные"/>
+
             <TextBlock Text="Фильтр по дате:" VerticalAlignment="Center" Margin="10,0,5,0" FontWeight="SemiBold" FontSize="14"/>
             <DatePicker x:Name="dpFilterDate" 
                         Width="140" Height="32" VerticalAlignment="Center" Margin="10,0,0,0"
@@ -73,5 +80,16 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Статусная строка -->
+        <Border Grid.Row="2" 
+                Background="#FFF9F9F9" 
+                BorderBrush="#FFEEEEEE" 
+                BorderThickness="0,1,0,0"
+                Padding="10,5">
+            <TextBlock x:Name="tbStatus" 
+                       FontSize="12"
+                       Foreground="#666666"/>
+        </Border>
     </Grid>
 </Page>

@@ -4,7 +4,7 @@
         Title="Уведомления" 
         Height="500" 
         Width="700"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         MinHeight="400"
         MinWidth="600">
 
@@ -40,11 +40,18 @@
                 Margin="0,50,0,0">
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="btnMarkAsRead" 
-                        Content="Пометить как прочитанные"
+                        Content="Пометить все как прочитанные"
                         Style="{StaticResource NavButtonStyle}"
                         Height="36"
                         Padding="12,8"
                         Click="BtnMarkAsRead_Click"/>
+                <Button x:Name="btnMarkSelectedAsRead" 
+                        Content="Отметить выбранное"
+                        Style="{StaticResource NavButtonStyle}"
+                        Height="36"
+                        Padding="12,8"
+                        Margin="10,0,0,0"
+                        Click="BtnMarkSelectedAsRead_Click"/>
                 <Button x:Name="btnRefresh" 
                         Content="Обновить"
                         Style="{StaticResource NavButtonStyle}"
@@ -61,7 +68,8 @@
                   Margin="15,10,15,10"
                   AutoGenerateColumns="False"
                   SelectionMode="Single"
-                  IsReadOnly="True">
+                  IsReadOnly="True"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Статус" Width="80">
                     <DataGridTemplateColumn.CellTemplate>

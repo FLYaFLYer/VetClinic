@@ -35,17 +35,39 @@ namespace VetClinic.Pages
             }
         }
 
-        private void LoadData()
+        // Изменяем на public для доступа из MainWindow
+        public void LoadData()
         {
-            _isSearching = false;
+            try
+            {
+                _isSearching = false;
 
-            _context.Patients
-                .Include(p => p.Owner)
-                .Include(p => p.AnimalType)
-                .Include(p => p.Breed)
-                .Load();
+                // Очищаем локальную коллекцию
+                _context.Patients.Local.Clear();
 
-            dataGrid.ItemsSource = _context.Patients.Local;
+                // Загружаем данные заново
+                var patients = _context.Patients
+                    .Include(p => p.Owner)
+                    .Include(p => p.AnimalType)
+                    .Include(p => p.Breed)
+                    .ToList();
+
+                // Добавляем в локальную коллекцию
+                foreach (var patient in patients)
+                {
+                    _context.Patients.Local.Add(patient);
+                }
+
+                dataGrid.ItemsSource = _context.Patients.Local;
+                dataGrid.Items.Refresh();
+
+                tbStatus.Text = $"Загружено пациентов: {patients.Count}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // Поиск по кличке (50 проблема)
@@ -68,6 +90,9 @@ namespace VetClinic.Pages
                 .ToList();
 
             dataGrid.ItemsSource = filteredPatients;
+
+            // Обновляем статус
+            tbStatus.Text = $"Найдено: {filteredPatients.Count} пациентов";
         }
 
         private void BtnAddPatient_Click(object sender, RoutedEventArgs e)
@@ -97,6 +122,9 @@ namespace VetClinic.Pages
                 _context.Patients.Add(newPatient);
                 _context.SaveChanges();
                 LoadData();
+
+                MessageBox.Show("Пациент успешно добавлен", "Успех",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -307,6 +335,41 @@ namespace VetClinic.Pages
             dialog.ShowDialog();
         }
 
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _isSearching = false;
+
+                // Очищаем кэш контекста
+                _context.ChangeTracker.Entries().ToList().ForEach(entry => entry.State = System.Data.Entity.EntityState.Detached);
+
+                // Загружаем заново
+                var patients = _context.Patients
+                    .Include(p => p.Owner)
+                    .Include(p => p.AnimalType)
+                    .Include(p => p.Breed)
+                    .ToList();
+
+                // Обновляем DataGrid
+                dataGrid.ItemsSource = patients;
+                dataGrid.Items.Refresh();
+
+                tbStatus.Text = $"Данные обновлены. Пациентов: {patients.Count}";
+
+                // Очищаем поиск
+                txtSearch.Text = "";
+
+                MessageBox.Show("Данные успешно обновлены", "Обновление",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при обновлении: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         // Метод для просмотра особых примет (27 проблема)
         private void ViewFeatures_Click(object sender, RoutedEventArgs e)
         {
@@ -320,7 +383,7 @@ namespace VetClinic.Pages
                         Title = "Особые приметы",
                         Width = 500,
                         Height = 400,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
                         Owner = Application.Current.MainWindow,
                         WindowStyle = WindowStyle.ToolWindow,
                         ResizeMode = ResizeMode.CanResize
@@ -374,6 +437,13 @@ namespace VetClinic.Pages
                         "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // Отключаем автообновление при закрытии страницы
+            AutoRefreshHelper.StopAutoRefresh();
+            _context?.Dispose();
         }
     }
 }
